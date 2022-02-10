@@ -1,3 +1,3 @@
 ### chaitanya
 
-intiger is  working with.
+finally it is woriking
