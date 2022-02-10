@@ -1,3 +1,3 @@
 ### chaitanya
 
-intiger is  working
+intiger is  working with wrong intiger
