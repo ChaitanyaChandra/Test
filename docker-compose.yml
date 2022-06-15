@@ -1,0 +1,15 @@
+ version: "3.8"
+ services:
+      nodeserver:
+          build:
+              context: ./nodejs 		# <= Which folder has nodejs Dockerfile (Build context)
+          ports:
+              - "1234:3000" 			  # <= Port mappings from HOST to Container
+      nginx:
+          restart: always
+          build:
+              context: ./nginx 		  # <= Which folder has nginx Dockerfile
+          ports:
+              - "80:80" 				    # <= Starting with - means an ARRAY in YAML.
+      redis-server:
+          image: 'redis'
