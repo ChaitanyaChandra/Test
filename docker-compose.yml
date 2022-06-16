@@ -1,10 +1,10 @@
 version: "3.8"
 services:
-    #  nodeserver:
-    #      build:
-    #          context: ./nodejs
-    #      ports:
-    #          - "1234:3000"
+     nodeserver:
+         build:
+             context: ./nodejs
+         ports:
+             - "1234:3000"
      nginx:
          restart: always
          build:
