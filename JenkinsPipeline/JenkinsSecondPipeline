@@ -1,0 +1,14 @@
+pipeline {
+    agent any
+    parameters {
+        string(name: 'Version', defaultValue: '0.0', description: 'application version'),
+        string(name: 'APPLICATION_NAME', defaultValue: 'Test Application', description: 'name of the application to promote')
+    }
+    stages {
+        stage('Build') {
+            steps {
+                sh "echo APPLICATION NAME: ${env.APPLICATION_NAME} and version: ${env.Version}"
+            }
+        }
+    }
+}

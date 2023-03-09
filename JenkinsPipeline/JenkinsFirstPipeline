@@ -1,0 +1,20 @@
+pipeline {
+    agent any
+    parameters {
+        string(name: 'ENV', defaultValue: 'test', description: 'name of environment'),
+        string(name: 'Version', defaultValue: '0.0', description: 'application version'),
+        string(name: 'APPLICATION_NAME', defaultValue: 'Test Application', description: 'name of the application to promote')
+    }
+    stages {
+        stage('Build') {
+            steps {
+                sh "echo Env: ${env.ENV}, APPLICATION NAME: ${env.APPLICATION_NAME} and version: ${env.Version}"
+            }
+        }
+    }
+    post {
+        success {
+            build job: 'jobTwo', parameters: [string(name: 'Version', value: env.Version), string(name: 'APPLICATION_NAME', value: env.APPLICATION_NAME)],  wait: false
+        }
+    }
+}
