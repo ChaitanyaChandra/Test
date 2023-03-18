@@ -1,4 +1,4 @@
-data "aws_vpc" "fetch-vpc" {
+data "aws_vpcs" "fetch-vpc" {
   tags = {
     Name = "test-one-vpc_one"
   }
@@ -6,9 +6,9 @@ data "aws_vpc" "fetch-vpc" {
 
 
 output "vpc_id" {
-  value = data.aws_vpc.fetch-vpc.id
+  value = data.aws_vpcs.fetch-vpc.*.id
 }
 
 output "vpc_arn" {
-  value = data.aws_vpc.fetch-vpc.arn
+  value = data.aws_vpcs.fetch-vpc.*.arn
 }
