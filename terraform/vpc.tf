@@ -18,3 +18,7 @@ output "vpc_arn" {
 output "vpc_name" {
   value = var.vpc_name
 }
+
+output "owner_id" {
+  value = aws_vpc.vpc_one.owner_id
+}
