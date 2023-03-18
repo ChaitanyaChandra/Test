@@ -6,16 +6,25 @@ resource "aws_vpc" "vpc_one" {
   instance_tenancy = "default"
 
   tags = {
-    Name = var.vpc_name          # var reference
+    Name = "${var.vpc_name}-vpc_one"          # var reference
   }
+
 }
 
 resource "aws_subnet" "subnet_one" {
   cidr_block = "10.0.0.0/17"
   vpc_id     = aws_vpc.vpc_one.id
+
+  tags = {
+    Name = "${var.vpc_name}-subnet_one"          # var reference
+  }
 }
 
 resource "aws_subnet" "subnet_two" {
   cidr_block = "10.0.128.0/17"
   vpc_id     = aws_vpc.vpc_one.id
+
+  tags = {
+    Name = "${var.vpc_name}-subnet_two"         # var reference
+  }
 }
