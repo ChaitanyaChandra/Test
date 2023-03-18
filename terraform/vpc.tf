@@ -14,3 +14,7 @@ resource "aws_vpc" "vpc_one" {
 output "vpc_arn" {
   value = aws_vpc.vpc_one.arn  # attribute
 }
+
+output "vpc_name" {
+  value = var.vpc_name
+}
