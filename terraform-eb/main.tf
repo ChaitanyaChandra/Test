@@ -5,7 +5,7 @@ module "eb" {
 }
 
 output "my_autoscaling_groups" {
-  value = module.eb.auto_scaling_groups
+  value = module.eb.auto_scaling_groups[0]
 }
 
 #resource "aws_autoscaling_lifecycle_hook" "lifecycle_hook" {
