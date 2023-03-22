@@ -10,7 +10,7 @@ resource "aws_elastic_beanstalk_environment" "default" {
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "IamInstanceProfile"
-    value     = "arn:aws:iam::762942456166:instance-profile/EC2_admin"
+    value     = "EC2_admin"
   }
 
 }
