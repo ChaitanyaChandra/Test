@@ -16,5 +16,5 @@ resource "aws_elastic_beanstalk_environment" "default" {
 }
 
 output "auto_scaling_groups" {
-  value = aws_elastic_beanstalk_environment.default.autoscaling_groups
+  value = tolist(aws_elastic_beanstalk_environment.default.autoscaling_groups)
 }
