@@ -27,4 +27,15 @@ locals {
   ]
   ])
 
+  all = flatten([
+  for env_name in local.env : [
+  for eb_env_obj in local.eb_env : [
+  for env_type in local.type : {
+    name= "${eb_env_obj.name}-${env_name}-${env_type}"  # list of dict
+    heartbeat_time = eb_env_obj.heartbeat_time
+  }
+  ]
+  ]
+  ])
+
 }
