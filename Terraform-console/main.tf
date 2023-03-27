@@ -15,8 +15,7 @@ locals {
   for env_name in local.env : [
   for eb_env_obj in local.eb_env : {
     name= "${eb_env_obj.name}-${env_name}"  # list of dict
-#    env_name = env_name
-#    eb_name = eb_env_obj.name
+    heartbeat_time = eb_env_obj.heartbeat_time
   }
   ]
   ])
