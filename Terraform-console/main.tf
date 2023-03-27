@@ -11,14 +11,6 @@ locals {
       heartbeat_time = 53
     }
   ]
-  association_list_of_dict = flatten([
-  for env_name in local.env : [
-  for eb_env_obj in local.eb_env : {
-    name= "${eb_env_obj.name}-${env_name}"  # list of dict
-    heartbeat_time = eb_env_obj.heartbeat_time
-  }
-  ]
-  ])
 
   association_list = flatten([
   for env_name in local.env : [
@@ -27,15 +19,15 @@ locals {
   ]
   ])
 
-  all = flatten([
+  association_dict = flatten([
   for env_name in local.env : [
   for eb_env_obj in local.eb_env : [
   for env_type in local.type : {
     name= "${eb_env_obj.name}-${env_name}-${env_type}"  # list of dict
     heartbeat_time = eb_env_obj.heartbeat_time
-  }
-  ]
-  ]
+        }
+      ]
+    ]
   ])
 
 }
