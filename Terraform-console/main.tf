@@ -1,31 +1,23 @@
 locals {
   env = ["dev", "uat", "prod"]
+  type = ["blue", "green"]
   eb_env = [
     {
-      name = "eb_one"
+      name = "salesforce-integrator"
       heartbeat_time = 52
     },
     {
-      name = "eb_two"
+      name = "assignment-service"
       heartbeat_time = 53
     }
   ]
-}
-
-resource "null_resource" "example" {
-    for env_name in local.env:
-    for eb in local.eb_env:
-    "${env_name}-${eb["name"]}" => {
-    env_name = env_name
-    eb_name = eb["name"]
-    }
-
-  triggers = {
-  env_name = each.value.env_name
-  eb_name = each.value.eb_name
+  association_list = flatten([
+  for env_name in local.env : [
+  for eb_env_obj in local.eb_env : {
+    name= "${eb_env_obj}-${env_name}"
+#    env_name = env_name
+#    eb_name = eb_env_obj.name
   }
-
-  provisioner "local-exec" {
-  command = "echo ${each.key}"
-  }
+  ]
+  ])
 }
