@@ -31,3 +31,12 @@ locals {
   ])
 
 }
+
+
+resource "null_resource" "test_loop" {
+  for_each = { for association in local.association_dict : association.name => association }
+
+  provisioner "local-exec" {
+    command = "echo Name: ${each.value.name}, Heartbeat Time: ${each.value.heartbeat_time}"
+  }
+}
