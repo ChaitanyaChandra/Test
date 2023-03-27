@@ -1,6 +1,6 @@
 locals {
   env = ["dev", "uat", "prod"]
-  eb_enveronments = [
+  eb_env = [
     {
       name = "eb_one"
       heartbeat_time = 52
