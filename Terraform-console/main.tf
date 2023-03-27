@@ -1,5 +1,5 @@
 locals {
-  env = [dev, uat, prod]
+  env = ["dev", "uat", "prod"]
   eb_enveronments = [
     {
       name = "eb_one"
