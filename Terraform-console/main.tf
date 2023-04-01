@@ -40,3 +40,13 @@ resource "null_resource" "test_loop" {
     command = "echo Name: ${each.value.name}, Heartbeat Time: ${each.value.heartbeat_time}"
   }
 }
+
+
+resource "aws_autoscaling_lifecycle_hook" "lifecycle_hook" {
+  count = length(module.eb.auto_scaling_groups)
+  name                   = "lifecycle-hook-${count.index}"
+  autoscaling_group_name = module.eb.auto_scaling_groups[count.index]
+  default_result         = "CONTINUE"
+  heartbeat_timeout      = 100
+  lifecycle_transition   = "autoscaling:EC2_INSTANCE_LAUNCHING"
+}
