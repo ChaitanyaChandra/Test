@@ -12,3 +12,7 @@ module "green" {
   subnet_cider_range = "172.31.192.0/18"
   subnet_name = "green-2"
 }
+
+output "nodejs_subnet_name" {
+  value = module.blue.0.subnet_name
+}
