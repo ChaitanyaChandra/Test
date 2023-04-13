@@ -16,7 +16,7 @@ node {
 
     stage('Deploy') {
       if ( env.BRANCH_NAME == "master" || env.TAG_NAME ==~ ".*" ) {
-         dir('Azure-jenkins') {
+         dir('Azure-jenkins/Terraform') {
              sh "ls"
              }
          }
