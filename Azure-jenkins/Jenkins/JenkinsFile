@@ -17,9 +17,9 @@ node {
 
       if ( env.BRANCH_NAME == "master" || env.TAG_NAME ==~ ".*" ){
         sh 'pwd ; ls'
-//          dir('Azure-jenkins/Terraform') {
-//              sh "ls"
-//              }
+         dir('Azure-jenkins/Terraform') {
+             sh "ls"
+             }
          echo 'terraform code'
          }
       }
