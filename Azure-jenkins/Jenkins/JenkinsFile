@@ -6,11 +6,11 @@ node {
     }
 
     stage('Build') {
-        sh 'your-build-command-here'
+        echo 'your-build-command-here'
     }
 
     stage('Test') {
-        sh 'your-test-command-here'
+        echo 'your-test-command-here'
     }
 
     stage('Deploy') {
