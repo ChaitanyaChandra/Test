@@ -1,7 +1,6 @@
 node {
     stage('Checkout') {
       stage('Code Checkout') {
-       // sh 'find . | sed 1d |xargs rm -rf'
         git branch: 'master', url: "https://github.com/chaitanyachandra/test.git"
       }
     }
