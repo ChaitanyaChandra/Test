@@ -1,0 +1,26 @@
+node {
+    stage('Checkout') {
+      stage('Code Checkout') {
+        sh 'find . | sed 1d |xargs rm -rf'
+        git branch: 'master', url: "https://github.com/chaitanyachandra/test.git"
+      }
+    }
+
+    stage('Build') {
+        sh 'your-build-command-here'
+    }
+
+    stage('Test') {
+        sh 'your-test-command-here'
+    }
+
+    stage('Deploy') {
+      if ( env.BRANCH_NAME == "master" || env.TAG_NAME ==~ ".*" ) {
+         dir('Azure-jenkins') {
+             sh "ls"
+             }
+         }
+         echo 'terraform code'
+      }
+    }
+}
