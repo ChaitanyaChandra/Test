@@ -15,10 +15,11 @@ node {
 
     stage('Deploy') {
 
-      if ( env.BRANCH_NAME == "master" || env.TAG_NAME ==~ ".*" ) {
-         dir('Azure-jenkins/Terraform') {
-             sh "ls"
-             }
+      if ( env.BRANCH_NAME == "master" || env.TAG_NAME ==~ ".*" )
+        sh 'pwd ; ls'
+//          dir('Azure-jenkins/Terraform') {
+//              sh "ls"
+//              }
          echo 'terraform code'
          }
       }
