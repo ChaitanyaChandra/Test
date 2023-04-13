@@ -21,6 +21,5 @@ node {
              }
          echo 'terraform code'
          }
-
       }
 }
