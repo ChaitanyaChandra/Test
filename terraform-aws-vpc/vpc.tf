@@ -3,7 +3,7 @@ resource "aws_vpc" "main" {
   instance_tenancy = "default"
 
   tags = {
-    Name = "chaitanya-vpc"
-    Department = "IITS"
+    Name = var.vpc_name
+    Department = var.vpc_department
   }
 }
