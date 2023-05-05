@@ -1,0 +1,2 @@
+#!/bin/bash
+sudo ansible-pull -U https://github.com/ChaitanyaChandra/DevOps.git 2.ANSIBLE/spec.yml -e 'ROLE=jenkins_setup' -e 'HOST=localhost' -e 'ROOT_USER=true' -c 2.ANSIBLE/ansible.cfg -d /tmp/ansible  >> /tmp/user_data.txt
