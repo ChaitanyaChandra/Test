@@ -55,9 +55,9 @@ for data in instance_data:
 
     # Print the average CPU utilization metric for the past 30 days
     datapoints = response['Datapoints']
-    print(datapoints)
     if len(datapoints) > 0:
         average_cpu = datapoints[-1]['Average']
+        print(average_cpu)
         print(f"{data.get('InstanceId')} Average CPU utilization over the past 30 days: {average_cpu:.2f}%")
     else:
         print("No data available for the past 30 days.")
