@@ -71,9 +71,9 @@ def calculate(days):
                 #     print(f"No data available for the past {days} days.")
 
 
-# calculate(5)
-# calculate(10)
-# calculate(15)
+calculate(5)
+calculate(10)
+calculate(15)
 # keys = instance_data[0].keys()
 # # Write the instance data to a CSV file
 # with open('instance_data.csv', 'w', newline='') as output_file:
