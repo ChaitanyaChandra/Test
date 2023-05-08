@@ -21,7 +21,8 @@ instance_data = []
 for reservation in response['Reservations']:
     for instance in reservation['Instances']:
         instance_data.append({"ID" : instance['InstanceId']})
-        #print(instance)
+        print(instance)
+        # print(instance) 'Tags': [{'Key': 'user', 'Value': 'chaitanya'}]  list(dict)
 
 
 # Print the instance IDs
