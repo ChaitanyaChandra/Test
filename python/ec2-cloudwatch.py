@@ -25,4 +25,4 @@ for reservation in response['Reservations']:
 
 
 # Print the instance IDs
-print(instance_ids)
+print(instance_data)
