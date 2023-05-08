@@ -57,7 +57,7 @@ def calculate(days):
                 )
 
                 datapoints = response['Datapoints']
-                print(datapoints)
+                print(response)
                 # metric_datapoints = []
                 # if len(datapoints) > 0:
                 #     for datapoint in datapoints:
