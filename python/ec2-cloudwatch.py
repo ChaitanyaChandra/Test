@@ -49,7 +49,7 @@ for data in instance_data:
         ],
         StartTime=start_time,
         EndTime=end_time,
-        Period=86400,
+        Period=3600,
         Statistics=['Average'],
         Unit='Percent'
     )
