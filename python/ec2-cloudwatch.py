@@ -1,4 +1,5 @@
 import boto3
+import csv
 from datetime import datetime, timedelta
 ec2 = boto3.client('ec2')
 cloudwatch = boto3.client('cloudwatch')
@@ -29,7 +30,6 @@ for reservation in response['Reservations']:
         # print(instance) 'Tags': [{'Key': 'user', 'Value': 'chaitanya'}]  list(dict)
 
 
-# Print the instance IDs
 # print(instance_data)
 
 end_time = datetime.utcnow()
@@ -65,5 +65,14 @@ for data in instance_data:
         # print(f"{data.get('InstanceId')} Average CPU utilization over the past {days} days: {average_cpu:.2f}%")
     else:
         print(f"No data available for the past {days} days.")
+
+
+
+with open('instance_data.csv', mode='w', newline='') as csv_file:
+    fieldnames = ['InstanceId', 'Service', 'Name', 'Environment', 'InstanceType', 'Average_cpu']
+    writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+    writer.writeheader()
+    for data in instance_data:
+        writer.writerow(data)
 
 print(instance_data)
