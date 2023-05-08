@@ -56,9 +56,8 @@ def calculate(days):
                     Unit=v
                 )
 
-                print(response)
-
                 datapoints = response['Datapoints']
+                print(datapoints)
                 metric_datapoints = []
                 if len(datapoints) > 0:
                     for datapoint in datapoints:
