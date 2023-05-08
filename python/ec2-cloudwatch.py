@@ -21,7 +21,7 @@ instance_ids = ()
 instance_name = ()
 for reservation in response['Reservations']:
     for instance in reservation['Instances']:
-        instance_ids.append(instance['InstanceId'])
+        instance_ids.add(instance['InstanceId'])
         print(instance)
 
 
