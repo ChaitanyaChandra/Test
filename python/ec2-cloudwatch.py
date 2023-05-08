@@ -58,7 +58,7 @@ for data in instance_data:
     average_cpu = []
     if len(datapoints) > 0:
         for datapoint in datapoints:
-             average_cpu.append(datapoints.get('Average'))
+             average_cpu.append(datapoint.get('Average'))
         print(average_cpu)
         print(f"{data.get('InstanceId')} Average CPU utilization over the past 30 days: {average_cpu:.2f}%")
     else:
