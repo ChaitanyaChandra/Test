@@ -22,7 +22,7 @@ for reservation in response['Reservations']:
     for instance in reservation['Instances']:
         tags = instance.get('Tags', [])
         tag_dict = {tag['Key']: tag['Value'] for tag in tags}
-        instance_data.append({"ID" : instance['InstanceId'], "Service" : tag_dict.get('service'), "Name" : tag_dict.get('Name'), "Environment" : tag_dict.get('Environment')})
+        instance_data.append({"ID" : instance['InstanceId'], "Service" : tag_dict.get('Service'), "Name" : tag_dict.get('Name'), "Environment" : tag_dict.get('Environment')})
         # print(instance) 'Tags': [{'Key': 'user', 'Value': 'chaitanya'}]  list(dict)
 
 
