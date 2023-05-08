@@ -26,7 +26,6 @@ for reservation in response['Reservations']:
         tags = instance.get('Tags', [])
         tag_dict = {tag['Key']: tag['Value'] for tag in tags}
         instance_data.append({"InstanceId" : instance['InstanceId'], "Service" : tag_dict.get('Service'), "Name" : tag_dict.get('Name'), "Environment" : tag_dict.get('Environment'), "instanceType" : instance['InstanceType']})
-        # print(instance) 'Tags': [{'Key': 'user', 'Value': 'chaitanya'}]  list(dict)
 
 
 # print(instance_data)
