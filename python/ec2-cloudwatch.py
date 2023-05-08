@@ -50,7 +50,7 @@ def calculate(days):
                 ],
                 StartTime=start_time,
                 EndTime=end_time,
-                Period=300,
+                Period=3600,
                 Statistics=['Average'],
                 Unit=metric.get(list(metric.keys())[0])
             )
