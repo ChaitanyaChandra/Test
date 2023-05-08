@@ -74,6 +74,8 @@ with open('instance_data.csv', mode='w', newline='') as csv_file:
     writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
     writer.writeheader()
     for data in instance_data:
-        print(data)
+        for k, v in data:
+            print(k,v)
+            #writer.writerow(data)
 
 print(instance_data)
