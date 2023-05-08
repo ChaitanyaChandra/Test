@@ -7,6 +7,7 @@ cloudwatch = boto3.client('cloudwatch')
 # Set up the tag key and value to search for
 tag_key = 'user'
 tag_value = 'chaitanya'
+days = 31
 
 # Filter the instances by the tag key and value
 response = ec2.describe_instances(
@@ -33,7 +34,7 @@ for reservation in response['Reservations']:
 
 
 end_time = datetime.utcnow()
-start_time = end_time - timedelta(days=31)
+start_time = end_time - timedelta(days)
 for data in instance_data:
 
 
@@ -59,7 +60,8 @@ for data in instance_data:
     if len(datapoints) > 0:
         for datapoint in datapoints:
              average_cpu.append(datapoint.get('Average'))
-        print(average_cpu)
-        print(f"{data.get('InstanceId')} Average CPU utilization over the past 30 days: {average_cpu:.2f}%")
+        # print(average_cpu)
+        average = sum(average_cpu) / len(average_cpu)
+        print(f"{data.get('InstanceId')} Average CPU utilization over the past 30 days: {average:.2f}%")
     else:
         print("No data available for the past 30 days.")
