@@ -56,7 +56,8 @@ def calculate(days):
                     Unit=v
                 )
 
-                # Print the average CPU utilization metric for the past 30 days
+                print(response)
+
                 datapoints = response['Datapoints']
                 metric_datapoints = []
                 if len(datapoints) > 0:
