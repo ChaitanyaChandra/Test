@@ -70,7 +70,7 @@ def calculate(days):
                     print(f"No data available for the past {days} days.")
 
 
-calculate(instance_data)
+calculate(5)
 # calculate(10)
 # calculate(15)
 # keys = instance_data[0].keys()
