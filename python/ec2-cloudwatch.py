@@ -69,7 +69,7 @@ for data in instance_data:
 
 keys = instance_data[0].keys()
 # Write the instance data to a CSV file
-with open('people.csv', 'w', newline='') as output_file:
+with open('instance_data.csv', 'w', newline='') as output_file:
     dict_writer = csv.DictWriter(output_file, keys)
     dict_writer.writeheader()
     dict_writer.writerows(instance_data)
