@@ -68,8 +68,9 @@ for data in instance_data:
 
 
 
+# Write the instance data to a CSV file
 with open('instance_data.csv', mode='w', newline='') as csv_file:
-    fieldnames = ['InstanceId', 'Service', 'Name', 'Environment', 'InstanceType', 'Average_cpu']
+    fieldnames = ['InstanceId', 'Service', 'Name', 'Environment', 'InstanceType', f'Average_cpu_past_{days}_days']
     writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
     writer.writeheader()
     for data in instance_data:
