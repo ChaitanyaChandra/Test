@@ -58,16 +58,16 @@ def calculate(days):
 
                 datapoints = response['Datapoints']
                 print(datapoints)
-                metric_datapoints = []
-                if len(datapoints) > 0:
-                    for datapoint in datapoints:
-                        metric_datapoints.append(datapoint.get('Average'))
-                    # print(average_cpu)
-                    average_metric = sum(metric_datapoints) / len(metric_datapoints)
-                    data.update({f"Average_{k}_past_{days}_days" : average_metric})
-                    # print(f"{data.get('InstanceId')} Average CPU utilization over the past {days} days: {average_cpu:.2f}%")
-                else:
-                    print(f"No data available for the past {days} days.")
+                # metric_datapoints = []
+                # if len(datapoints) > 0:
+                #     for datapoint in datapoints:
+                #         metric_datapoints.append(datapoint.get('Average'))
+                #     # print(average_cpu)
+                #     average_metric = sum(metric_datapoints) / len(metric_datapoints)
+                #     data.update({f"Average_{k}_past_{days}_days" : average_metric})
+                #     # print(f"{data.get('InstanceId')} Average CPU utilization over the past {days} days: {average_cpu:.2f}%")
+                # else:
+                #     print(f"No data available for the past {days} days.")
 
 
 calculate(5)
