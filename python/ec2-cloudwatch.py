@@ -17,11 +17,10 @@ response = ec2.describe_instances(
 )
 
 # Extract the instance IDs from the response
-instance_ids = ()
-instance_name = ()
+instance_data = []
 for reservation in response['Reservations']:
     for instance in reservation['Instances']:
-        instance_ids.add(instance['InstanceId'])
+        instance_data.append({"ID" : instance['InstanceId']})
         print(instance)
 
 
