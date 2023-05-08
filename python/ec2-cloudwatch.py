@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 ec2 = boto3.client('ec2')
 
 # Set up the tag key and value to search for
-tag_key = 'Service'
-tag_value = 'stimulator_service'
+tag_key = 'user'
+tag_value = 'chaitanya'
 
 # Filter the instances by the tag key and value
 response = ec2.describe_instances(
