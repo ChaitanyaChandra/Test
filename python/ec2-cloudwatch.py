@@ -67,15 +67,11 @@ for data in instance_data:
         print(f"No data available for the past {days} days.")
 
 
-
+keys = instance_data[0].keys()
 # Write the instance data to a CSV file
-with open('instance_data.csv', mode='w', newline='') as csv_file:
-    fieldnames = ['InstanceId', 'Service', 'Name', 'Environment', 'InstanceType', f'Average_cpu_past_{days}_days']
-    writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-    writer.writeheader()
-    for data in instance_data:
-        for k in data:
-            print(k)
-            #writer.writerow(data)
+with open('people.csv', 'w', newline='') as output_file:
+    dict_writer = csv.DictWriter(output_file, keys)
+    dict_writer.writeheader()
+    dict_writer.writerows(instance_data)
 
 print(instance_data)
