@@ -33,7 +33,7 @@ for reservation in response['Reservations']:
 
 
 end_time = datetime.utcnow()
-start_time = end_time - timedelta(days=30)
+start_time = end_time - timedelta(days=31)
 for data in instance_data:
 
 
