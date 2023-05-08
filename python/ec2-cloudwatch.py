@@ -25,13 +25,12 @@ for reservation in response['Reservations']:
     for instance in reservation['Instances']:
         tags = instance.get('Tags', [])
         tag_dict = {tag['Key']: tag['Value'] for tag in tags}
-        instance_data.append({"InstanceId" : instance['InstanceId'], "Service" : tag_dict.get('Service'), "Name" : tag_dict.get('Name'), "Environment" : tag_dict.get('Environment')})
+        instance_data.append({"InstanceId" : instance['InstanceId'], "Service" : tag_dict.get('Service'), "Name" : tag_dict.get('Name'), "Environment" : tag_dict.get('Environment'), "instanceType" : instance['InstanceType']})
         # print(instance) 'Tags': [{'Key': 'user', 'Value': 'chaitanya'}]  list(dict)
 
 
 # Print the instance IDs
 # print(instance_data)
-
 
 end_time = datetime.utcnow()
 start_time = end_time - timedelta(days)
@@ -62,6 +61,10 @@ for data in instance_data:
              cpu.append(datapoint.get('Average'))
         # print(average_cpu)
         average_cpu = sum(cpu) / len(cpu)
+        data.update({"Average_cpu" : average_cpu})
+
         print(f"{data.get('InstanceId')} Average CPU utilization over the past {days} days: {average_cpu:.2f}%")
     else:
         print(f"No data available for the past {days} days.")
+
+print(instance_data)
