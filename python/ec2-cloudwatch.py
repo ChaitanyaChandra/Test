@@ -57,8 +57,8 @@ def calculate(days):
                 )
 
                 datapoints = response['Datapoints']
-                print(response)
                 metric_datapoints = []
+                print(len(datapoints))
                 if len(datapoints) > 0:
                     for datapoint in datapoints:
                         metric_datapoints.append(datapoint.get('Average'))
