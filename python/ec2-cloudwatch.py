@@ -63,7 +63,7 @@ def calculate(days):
                     metric_datapoints.append(datapoint.get('Average'))
                 # print(average_cpu)
                 average_metric = sum(metric_datapoints) / len(metric_datapoints)
-                data.update({f"Average_cpu_past_{days}_days" : average_metric})
+                data.update({f"Average_{list(metric.keys())[0]}_past_{days}_days" : average_metric})
                 # print(f"{data.get('InstanceId')} Average CPU utilization over the past {days} days: {average_cpu:.2f}%")
             else:
                 print(f"No data available for the past {days} days.")
