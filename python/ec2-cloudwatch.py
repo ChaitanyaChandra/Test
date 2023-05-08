@@ -31,7 +31,7 @@ for reservation in response['Reservations']:
 # print(instance_data)
 
 #metrics = [{'CPUUtilization' : 'Percent'},{'NetworkInBytes':'Bytes'} , {'NetworkOutBytes' : 'Bytes'}]
-metrics = [{'NetworkInBytes':'Bytes'} , {'NetworkOutBytes' : 'Bytes'}]
+metrics = [{'NetworkIn':'Bytes'} , {'NetworkOut' : 'Bytes'}]
 
 def calculate(days):
     end_time = datetime.utcnow()
