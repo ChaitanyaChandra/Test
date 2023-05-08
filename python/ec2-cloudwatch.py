@@ -1,6 +1,8 @@
 import boto3
 from datetime import datetime, timedelta
 ec2 = boto3.client('ec2')
+cloudwatch = boto3.client('cloudwatch')
+
 
 # Set up the tag key and value to search for
 tag_key = 'user'
@@ -22,9 +24,39 @@ for reservation in response['Reservations']:
     for instance in reservation['Instances']:
         tags = instance.get('Tags', [])
         tag_dict = {tag['Key']: tag['Value'] for tag in tags}
-        instance_data.append({"ID" : instance['InstanceId'], "Service" : tag_dict.get('Service'), "Name" : tag_dict.get('Name'), "Environment" : tag_dict.get('Environment')})
+        instance_data.append({"InstanceId" : instance['InstanceId'], "Service" : tag_dict.get('Service'), "Name" : tag_dict.get('Name'), "Environment" : tag_dict.get('Environment')})
         # print(instance) 'Tags': [{'Key': 'user', 'Value': 'chaitanya'}]  list(dict)
 
 
 # Print the instance IDs
-print(instance_data)
+# print(instance_data)
+
+
+end_time = datetime.utcnow()
+start_time = end_time - timedelta(days=30)
+for cpu in instance_data:
+
+
+    response = cloudwatch.get_metric_statistics(
+        Namespace='AWS/EC2',
+        MetricName='CPUUtilization',
+        Dimensions=[
+            {
+                'Name': 'InstanceId',
+                'Value': instance_data.get('InstanceId')
+            },
+        ],
+        StartTime=start_time,
+        EndTime=end_time,
+        Period=3600,
+        Statistics=['Average'],
+        Unit='Percent'
+    )
+
+    # Print the average CPU utilization metric for the past 30 days
+    datapoints = response['Datapoints']
+    if len(datapoints) > 0:
+        average_cpu = datapoints[-1]['Average']
+        print(f'Average CPU utilization over the past 30 days: {average_cpu:.2f}%')
+    else:
+        print('No data available for the past 30 days.')
