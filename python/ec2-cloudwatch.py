@@ -30,8 +30,7 @@ for reservation in response['Reservations']:
 
 # print(instance_data)
 
-#metrics = [{'CPUUtilization' : 'Percent'},{'NetworkInBytes':'Bytes'} , {'NetworkOutBytes' : 'Bytes'}]
-metrics = [{'NetworkIn':'Bytes'} , {'NetworkOut' : 'Bytes'}]
+metrics = [{'CPUUtilization' : 'Percent'},{'NetworkInBytes':'Bytes'} , {'NetworkOutBytes' : 'Bytes'}]
 
 def calculate(days):
     end_time = datetime.utcnow()
@@ -56,7 +55,6 @@ def calculate(days):
                     Unit=v
                 )
 
-                print(response)
                 datapoints = response['Datapoints']
                 metric_datapoints = []
                 if len(datapoints) > 0:
@@ -70,9 +68,10 @@ def calculate(days):
                     print(f"instance {data.get('InstanceId')} metric {k} No data available for the past {days} days.")
 
 
-calculate(5)
-calculate(10)
-calculate(15)
+calculate(days=5)
+calculate(days=10)
+calculate(days=15)
+calculate(days=20)
 keys = instance_data[0].keys()
 # Write the instance data to a CSV file
 with open('instance_data.csv', 'w', newline='') as output_file:
