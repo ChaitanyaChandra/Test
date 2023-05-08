@@ -7,7 +7,7 @@ cloudwatch = boto3.client('cloudwatch')
 # Set up the tag key and value to search for
 tag_key = 'user'
 tag_value = 'chaitanya'
-days = 31
+days = 30
 
 # Filter the instances by the tag key and value
 response = ec2.describe_instances(
