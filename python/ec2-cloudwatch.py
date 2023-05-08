@@ -62,6 +62,6 @@ for data in instance_data:
              average_cpu.append(datapoint.get('Average'))
         # print(average_cpu)
         average = sum(average_cpu) / len(average_cpu)
-        print(f"{data.get('InstanceId')} Average CPU utilization over the past 30 days: {average:.2f}%")
+        print(f"{data.get('InstanceId')} Average CPU utilization over the past {days} days: {average:.2f}%")
     else:
-        print("No data available for the past 30 days.")
+        print(f"No data available for the past {days} days.")
