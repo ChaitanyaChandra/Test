@@ -31,45 +31,46 @@ for reservation in response['Reservations']:
 
 # print(instance_data)
 
+metrics = [{'CPUUtilization' : 'Percent'},{'NetworkInBytes':'Bytes'} , {'NetworkOutBytes' : 'Bytes'}]
 
-def calculate_avg_cpu(days):
+def calculate(days):
     end_time = datetime.utcnow()
     start_time = end_time - timedelta(days)
 
-    for data in instance_data:
-        response = cloudwatch.get_metric_statistics(
-            Namespace='AWS/EC2',
-            MetricName='CPUUtilization',
-            Dimensions=[
-                {
-                    'Name': 'InstanceId',
-                    'Value': data.get('InstanceId')
-                },
-            ],
-            StartTime=start_time,
-            EndTime=end_time,
-            Period=3600,
-            Statistics=['Average'],
-            Unit='Percent'
-        )
+    for metric in metrics:
+        for data in instance_data:
+            response = cloudwatch.get_metric_statistics(
+                Namespace='AWS/EC2',
+                MetricName=list(metric.keys())[0],
+                Dimensions=[
+                    {
+                        'Name': 'InstanceId',
+                        'Value': data.get('InstanceId')
+                    },
+                ],
+                StartTime=start_time,
+                EndTime=end_time,
+                Period=300,
+                Statistics=['Average'],
+                Unit=metric.get(list(metric.keys())[0])
+            )
 
-        # Print the average CPU utilization metric for the past 30 days
-        datapoints = response['Datapoints']
-        cpu = []
-        if len(datapoints) > 0:
-            for datapoint in datapoints:
-                cpu.append(datapoint.get('Average'))
-            # print(average_cpu)
-            average_cpu = sum(cpu) / len(cpu)
-            data.update({f"Average_cpu_past_{days}_days" : f"{average_cpu:.2f}%"})
-            # print(f"{data.get('InstanceId')} Average CPU utilization over the past {days} days: {average_cpu:.2f}%")
-        else:
-            print(f"No data available for the past {days} days.")
+            # Print the average CPU utilization metric for the past 30 days
+            datapoints = response['Datapoints']
+            metric_datapoints = []
+            if len(datapoints) > 0:
+                for datapoint in datapoints:
+                    metric_datapoints.append(datapoint.get('Average'))
+                # print(average_cpu)
+                average_metric = sum(metric_datapoints) / len(metric_datapoints)
+                data.update({f"Average_cpu_past_{days}_days" : average_metric})
+                # print(f"{data.get('InstanceId')} Average CPU utilization over the past {days} days: {average_cpu:.2f}%")
+            else:
+                print(f"No data available for the past {days} days.")
 
 
-calculate_avg_cpu(10)
-calculate_avg_cpu(20)
-calculate_avg_cpu(30)
+calculate(10)
+calculate(20)
 keys = instance_data[0].keys()
 # Write the instance data to a CSV file
 with open('instance_data.csv', 'w', newline='') as output_file:
@@ -77,4 +78,4 @@ with open('instance_data.csv', 'w', newline='') as output_file:
     dict_writer.writeheader()
     dict_writer.writerows(instance_data)
 
-print(instance_data)
+# print(instance_data)
