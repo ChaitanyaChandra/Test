@@ -38,7 +38,7 @@ def calculate(days):
     start_time = end_time - timedelta(days)
 
     for metric in metrics:
-        for k, v in metric:
+        for k, v in metric.items():
             for data in instance_data:
                 response = cloudwatch.get_metric_statistics(
                     Namespace='AWS/EC2',
