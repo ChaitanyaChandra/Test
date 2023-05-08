@@ -34,7 +34,7 @@ for reservation in response['Reservations']:
 
 end_time = datetime.utcnow()
 start_time = end_time - timedelta(days=30)
-for cpu in instance_data:
+for data in instance_data:
 
 
     response = cloudwatch.get_metric_statistics(
@@ -43,7 +43,7 @@ for cpu in instance_data:
         Dimensions=[
             {
                 'Name': 'InstanceId',
-                'Value': instance_data.get('InstanceId')
+                'Value': data.get('InstanceId')
             },
         ],
         StartTime=start_time,
