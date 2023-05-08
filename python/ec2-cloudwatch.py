@@ -20,8 +20,10 @@ response = ec2.describe_instances(
 instance_data = []
 for reservation in response['Reservations']:
     for instance in reservation['Instances']:
-        instance_data.append({"ID" : instance['InstanceId']})
-        print(instance['Tags'][])
+        tags = instance.get('Tags', [])
+        tag_dict = {tag['Key']: tag['Value'] for tag in tags}
+        instance_data.append({"ID" : instance['InstanceId'], "Service" : tag_dict.get('service')})
+        print(tag_dict)
         # print(instance) 'Tags': [{'Key': 'user', 'Value': 'chaitanya'}]  list(dict)
 
 
