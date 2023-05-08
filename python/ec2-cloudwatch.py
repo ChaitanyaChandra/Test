@@ -40,7 +40,7 @@ def calculate(days):
     for metric in metrics:
         for k, v in metric.items():
             for data in instance_data:
-                print(f"{k, v}")
+                print(f"k and v is {k, v}")
                 response = cloudwatch.get_metric_statistics(
                     Namespace='AWS/EC2',
                     MetricName=k,
