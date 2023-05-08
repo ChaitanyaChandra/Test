@@ -66,17 +66,17 @@ def calculate(days):
                     data.update({f"Average_{k}_past_{days}_days" : average_metric})
                     # print(f"{data.get('InstanceId')} Average CPU utilization over the past {days} days: {average_cpu:.2f}%")
                 else:
-                    print(f"in instance {data.get('InstanceId')} for metric {k} No data available for the past {days} days.")
+                    print(f"instance {data.get('InstanceId')} metric {k} No data available for the past {days} days.")
 
 
 calculate(5)
-# calculate(10)
-# calculate(15)
-# keys = instance_data[0].keys()
-# # Write the instance data to a CSV file
-# with open('instance_data.csv', 'w', newline='') as output_file:
-#     dict_writer = csv.DictWriter(output_file, keys)
-#     dict_writer.writeheader()
-#     dict_writer.writerows(instance_data)
+calculate(10)
+calculate(15)
+keys = instance_data[0].keys()
+# Write the instance data to a CSV file
+with open('instance_data.csv', 'w', newline='') as output_file:
+    dict_writer = csv.DictWriter(output_file, keys)
+    dict_writer.writeheader()
+    dict_writer.writerows(instance_data)
 
 print(instance_data)
