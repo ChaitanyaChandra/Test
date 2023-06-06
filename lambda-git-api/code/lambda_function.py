@@ -1,6 +1,8 @@
-import requests
+import urllib3
 import base64
 import datetime
+import os
+import json
 
 utc_now = datetime.datetime.utcnow()
 
@@ -8,16 +10,17 @@ utc_now = datetime.datetime.utcnow()
 ist_offset = datetime.timedelta(hours=5, minutes=30)
 
 # Calculate the IST time by adding the offset to UTC time
-ist_now = f" {utc_now + ist_offset}"
+ist_now = utc_now + ist_offset
 
 
+def append_file_to_repository(repo_url, file_path, file_name, pat):
+    http = urllib3.PoolManager()
 
-def append_file_to_repository(repo_url, file_path, pat):
     headers = {
         'Authorization': f'Token {pat}',
         'Accept': 'application/vnd.github.v3+json'
     }
-    api_url = f'https://api.github.com/repos/{repo_url}/contents/{file_path + ist_now}'
+    api_url = f'https://api.github.com/repos/{repo_url}/contents/{ist_now.strftime("%Y/%m/") + file_name + ist_now.strftime(" %dth %A at %H:%M:%S")}'
 
     # Read the content of the file to append
     with open(file_path, 'r') as file:
@@ -33,16 +36,34 @@ def append_file_to_repository(repo_url, file_path, pat):
         'content': encoded_content
     }
 
+    # Convert payload to bytes
+    payload_bytes = json.dumps(payload).encode('utf-8')
+
     # Send the API request to append the file
-    response = requests.put(api_url, headers=headers, json=payload)
-    if response.status_code == 201:
+    response = http.request('PUT', api_url, headers=headers, body=payload_bytes)
+
+    if response.status == 201:
         print('File appended successfully.')
     else:
         print('Failed to append file.')
 
 
+def create_file(file_path):
+    try:
+        with open(file_path, 'w') as file:
+            # Perform any necessary operations with the file
+            # For example, write some content to the file
+            file.write(f'This is some xml content {ist_now}')
+
+        print(f'File created successfully: {file_path}')
+    except IOError as e:
+        print(f'Error creating file: {str(e)}')
+
+
 def lambda_handler(event, context):
-    repository_url = "Chaitanya-Chandra/Test"         # 'username/repository-name'
-    file_path = 'code.py'
+    repository_url = "Chaitanya-Chandra/Test"  # 'username/repository-name'
+    file_path = '/tmp/code.xml'
+    file_name = 'code.xml'
     personal_access_token = os.environ['GITHUB_TOKEN']
-    append_file_to_repository(repository_url, file_path, personal_access_token)
+    create_file(file_path)
+    append_file_to_repository(repository_url, file_path, file_name, personal_access_token)
