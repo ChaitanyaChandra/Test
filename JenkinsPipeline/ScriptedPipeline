@@ -1,0 +1,28 @@
+  node ("worker:node1"){
+    try {
+      env.SONAR_EXTRA_OPTS = "-Dsonar.java.binaries=./target"
+      env.APP_USER = "admin"
+      stage('Code Checkout') {
+        sh 'find . | sed 1d |xargs rm -rf'
+        git branch: "main", url: "https://github.com/chaitanyachandra/java-app.git"
+      }
+
+      stage('Compile Code') {
+        sh "pwd"
+        sh 'mvn compile'
+      }
+
+      stage('Code Quality') {
+      withCredentials([usernamePassword(credentialsId: 'APP_CREDS', passwordVariable: 'sonarPass', usernameVariable: 'sonarUser')]) {
+      echo "codequality"
+      sh '''
+       sonar-scanner -Dsonar.host.url="https://sonar.chaitu.net/" -Dsonar.login=${APP_USER} -Dsonar.password=${sonarPass} -Dsonar.projectKey=test -Dsonar.qualitygate.wait=true ${SONAR_EXTRA_OPTS}
+      '''
+        }
+      }
+
+    } catch (Exception e) {
+      echo "Error: " + e
+    }
+
+  }
