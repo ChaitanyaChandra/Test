@@ -1,0 +1,49 @@
+pipeline:
+  name: PipelineOne
+  identifier: PipelineOne
+  projectIdentifier: Dev
+  orgIdentifier: default
+  tags: {}
+  stages:
+    - stage:
+        name: Code Checkout
+        identifier: checkout
+        steps:
+          - step:
+              name: Cleanup
+              identifier: cleanup
+              type: ShellScript
+              commands: 
+                - find . | sed 1d |xargs rm -rf
+          - step:
+              name: Git Checkout
+              identifier: git_checkout
+              type: GitClone
+              properties:
+                cloneMethod: HTTP_BASIC_AUTH  
+                gitConnectorRef: Git
+                branch: main
+                url: https://github.com/chaitanyachandra/java-app.git
+        
+    - stage:
+        name: Code Compile
+        identifier: codecompile
+        steps:
+          - step:
+              name: mavencompile
+              identifier: mavencompile
+              type: ShellScript 
+              commands:
+                - echo "maven compile"
+
+    - stage:
+        name: Code Quality
+        identifier: sonarqube
+        steps:
+          - step:
+              name: SonarQube Scan
+              identifier: sonar_scan
+              type: ShellScript 
+              secrets: [ { secretName: sonar_credentials } ] # Reference a Harness secret
+              commands:
+                - echo "sonar scanner"
