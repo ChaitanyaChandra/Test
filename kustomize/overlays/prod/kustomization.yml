@@ -1,0 +1,12 @@
+resources:
+  - ../../base
+
+replicas:
+  - name: nginx-deployment
+    count: 3
+namespace: prod
+
+nameSuffix: -kustomize-prod
+
+patches:
+  - path: service-port.yml

@@ -1,0 +1,12 @@
+resources:
+  - ../../base
+
+replicas:
+  - name: nginx-deployment
+    count: 2
+namespace: qa
+
+nameSuffix: -kustomize-qa
+
+patches:
+  - path: service-port.yml
