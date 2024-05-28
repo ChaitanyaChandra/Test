@@ -1,0 +1,3 @@
+Deployment_name,Namespace,Replicas,MemoryLimits,CpuLimits,MemoryRequests,CpuRequests
+nginx-deployment-one,default,1,128Mi,500m,64Mi,250m
+nginx-deployment-two,default,2,129Mi,501m,64Mi,251m
