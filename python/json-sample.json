@@ -1,0 +1,199 @@
+{
+  "apiVersion": "v1",
+  "items": [
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "annotations": {
+          "deployment.kubernetes.io/revision": "1",
+          "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"annotations\":{},\"labels\":{\"app\":\"nginx\"},\"name\":\"nginx-deployment-one\",\"namespace\":\"default\"},\"spec\":{\"replicas\":1,\"selector\":{\"matchLabels\":{\"app\":\"nginx-one\"}},\"template\":{\"metadata\":{\"labels\":{\"app\":\"nginx-one\"}},\"spec\":{\"containers\":[{\"image\":\"nginx\",\"name\":\"app\",\"resources\":{\"limits\":{\"cpu\":\"500m\",\"memory\":\"128Mi\"},\"requests\":{\"cpu\":\"250m\",\"memory\":\"64Mi\"}}}]}}}}\n"
+        },
+        "creationTimestamp": "2024-05-28T12:23:54Z",
+        "generation": 1,
+        "labels": {
+          "app": "nginx"
+        },
+        "name": "nginx-deployment-one",
+        "namespace": "default",
+        "resourceVersion": "17804165",
+        "uid": "650ff138-c6ae-4184-bbc7-e9c7593ebb4f"
+      },
+      "spec": {
+        "progressDeadlineSeconds": 600,
+        "replicas": 1,
+        "revisionHistoryLimit": 10,
+        "selector": {
+          "matchLabels": {
+            "app": "nginx-one"
+          }
+        },
+        "strategy": {
+          "rollingUpdate": {
+            "maxSurge": "25%",
+            "maxUnavailable": "25%"
+          },
+          "type": "RollingUpdate"
+        },
+        "template": {
+          "metadata": {
+            "creationTimestamp": null,
+            "labels": {
+              "app": "nginx-one"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "image": "nginx",
+                "imagePullPolicy": "Always",
+                "name": "app",
+                "resources": {
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "128Mi"
+                  },
+                  "requests": {
+                    "cpu": "250m",
+                    "memory": "64Mi"
+                  }
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File"
+              }
+            ],
+            "dnsPolicy": "ClusterFirst",
+            "restartPolicy": "Always",
+            "schedulerName": "default-scheduler",
+            "securityContext": {},
+            "terminationGracePeriodSeconds": 30
+          }
+        }
+      },
+      "status": {
+        "availableReplicas": 1,
+        "conditions": [
+          {
+            "lastTransitionTime": "2024-05-28T12:23:58Z",
+            "lastUpdateTime": "2024-05-28T12:23:58Z",
+            "message": "Deployment has minimum availability.",
+            "reason": "MinimumReplicasAvailable",
+            "status": "True",
+            "type": "Available"
+          },
+          {
+            "lastTransitionTime": "2024-05-28T12:23:54Z",
+            "lastUpdateTime": "2024-05-28T12:23:58Z",
+            "message": "ReplicaSet \"nginx-deployment-one-7f7867dd8d\" has successfully progressed.",
+            "reason": "NewReplicaSetAvailable",
+            "status": "True",
+            "type": "Progressing"
+          }
+        ],
+        "observedGeneration": 1,
+        "readyReplicas": 1,
+        "replicas": 1,
+        "updatedReplicas": 1
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "annotations": {
+          "deployment.kubernetes.io/revision": "1",
+          "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"annotations\":{},\"labels\":{\"app\":\"nginx\"},\"name\":\"nginx-deployment-two\",\"namespace\":\"default\"},\"spec\":{\"replicas\":2,\"selector\":{\"matchLabels\":{\"app\":\"nginx-two\"}},\"template\":{\"metadata\":{\"labels\":{\"app\":\"nginx-two\"}},\"spec\":{\"containers\":[{\"image\":\"nginx\",\"name\":\"app\",\"resources\":{\"limits\":{\"cpu\":\"501m\",\"memory\":\"129Mi\"},\"requests\":{\"cpu\":\"251m\",\"memory\":\"64Mi\"}}}]}}}}\n"
+        },
+        "creationTimestamp": "2024-05-28T12:23:54Z",
+        "generation": 1,
+        "labels": {
+          "app": "nginx"
+        },
+        "name": "nginx-deployment-two",
+        "namespace": "default",
+        "resourceVersion": "17804167",
+        "uid": "3ffbadac-9baf-4fac-ab61-a0e2a259beff"
+      },
+      "spec": {
+        "progressDeadlineSeconds": 600,
+        "replicas": 2,
+        "revisionHistoryLimit": 10,
+        "selector": {
+          "matchLabels": {
+            "app": "nginx-two"
+          }
+        },
+        "strategy": {
+          "rollingUpdate": {
+            "maxSurge": "25%",
+            "maxUnavailable": "25%"
+          },
+          "type": "RollingUpdate"
+        },
+        "template": {
+          "metadata": {
+            "creationTimestamp": null,
+            "labels": {
+              "app": "nginx-two"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "image": "nginx",
+                "imagePullPolicy": "Always",
+                "name": "app",
+                "resources": {
+                  "limits": {
+                    "cpu": "501m",
+                    "memory": "129Mi"
+                  },
+                  "requests": {
+                    "cpu": "251m",
+                    "memory": "64Mi"
+                  }
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File"
+              }
+            ],
+            "dnsPolicy": "ClusterFirst",
+            "restartPolicy": "Always",
+            "schedulerName": "default-scheduler",
+            "securityContext": {},
+            "terminationGracePeriodSeconds": 30
+          }
+        }
+      },
+      "status": {
+        "availableReplicas": 2,
+        "conditions": [
+          {
+            "lastTransitionTime": "2024-05-28T12:23:58Z",
+            "lastUpdateTime": "2024-05-28T12:23:58Z",
+            "message": "Deployment has minimum availability.",
+            "reason": "MinimumReplicasAvailable",
+            "status": "True",
+            "type": "Available"
+          },
+          {
+            "lastTransitionTime": "2024-05-28T12:23:54Z",
+            "lastUpdateTime": "2024-05-28T12:23:58Z",
+            "message": "ReplicaSet \"nginx-deployment-two-78ffc88749\" has successfully progressed.",
+            "reason": "NewReplicaSetAvailable",
+            "status": "True",
+            "type": "Progressing"
+          }
+        ],
+        "observedGeneration": 1,
+        "readyReplicas": 2,
+        "replicas": 2,
+        "updatedReplicas": 2
+      }
+    }
+  ],
+  "kind": "List",
+  "metadata": {
+    "resourceVersion": ""
+  }
+}
