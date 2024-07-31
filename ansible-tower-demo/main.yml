@@ -1,4 +1,4 @@
-- name: Ping all hosts and register the output
+- name: Ping all hosts
   hosts: nodes
   tasks:
     - name: Ping nodes
