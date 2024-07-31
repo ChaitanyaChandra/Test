@@ -3,4 +3,3 @@
   tasks:
     - name: Ping nodes
       ping:
-      register: ping_result

@@ -1,3 +1,0 @@
-- name: Display ping result
-  debug:
-    var: ping_result

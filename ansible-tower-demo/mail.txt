@@ -1,0 +1,7 @@
+# Job Details:
+
+Job ID    : "{{ job.id }}",
+Name      : "{{ job.name }}",
+URL       : "{{ url }}",
+Status    : "{{ job.status }}"
+
