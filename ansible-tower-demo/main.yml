@@ -1,0 +1,10 @@
+- name: Ping all hosts and register the output
+  hosts: nodes
+  tasks:
+    - name: Ping nodes
+      ping:
+      register: ping_result
+
+    - name: Display ping result
+      debug:
+        var: ping_result
