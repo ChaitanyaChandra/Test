@@ -1,0 +1,6 @@
+- name: Ping all hosts
+  hosts: nodes
+  tasks:
+    - name: Ping nodes
+      ping:
+      register: ping_result
