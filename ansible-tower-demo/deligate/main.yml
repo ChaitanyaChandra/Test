@@ -62,5 +62,5 @@
     - name: copy file to remote michane
       copy:
         src: "{{ playbook_dir }}/inv.ini"
-        dest: /tmp/inv.ini
+        dest: /tmp/files/inv.ini
       delegate_to: node1.chaitu.net
