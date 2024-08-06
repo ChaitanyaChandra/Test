@@ -49,3 +49,6 @@
         dest: /tmp/file.yaml
         flat: yes
       delegate_to: node1.chaitu.net
+
+    - name: Fetch the file from the remote machine
+      shell: cat /tmp/file.yaml
