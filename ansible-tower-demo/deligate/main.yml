@@ -1,6 +1,6 @@
 - name: jinja 2 template
   hosts: localhost
-  connection: local
+#  connection: local
   gather_facts: false
   vars:
     state: present
