@@ -23,6 +23,22 @@
       delegate_to : node1.chaitu.net
       register: file_one
 
-    - name: print file name
+    - name: print file name      # sha1sum file.txt
       debug:
         msg: "{{ file_one.stat.checksum }}"
+
+
+    - name: relace client ID and client secret
+      block:
+      - name: Replace clientSecret with blank
+        replace:
+          path: /tmp/file.yaml
+          regexp: 'clientSecret:.*'
+          replace: 'clientSecret: '
+
+      - name: Replace clientID with blank
+        replace:
+          path: /tmp/file.yaml
+          regexp: 'clientID:.*'
+          replace: 'clientID: '
+      delegate_to : node1.chaitu.net
