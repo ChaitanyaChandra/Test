@@ -16,3 +16,13 @@
       args:
         chdir: "/tmp"
       delegate_to : node1.chaitu.net
+
+    - name: stat file
+      stat:
+        path: "/tmp/file.txt"
+      delegate_to : node1.chaitu.net
+      register: file_one
+
+    - name: print file name
+      debug:
+        msg: "{{ file_one.stat.checksum }}"
