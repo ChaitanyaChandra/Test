@@ -50,6 +50,7 @@
         flat: yes
       delegate_to: node1.chaitu.net
 
+
     - name: Fetch the file from the remote machine
       shell: cat /tmp/file.yaml
       register: file_output
@@ -57,3 +58,9 @@
     - name: Fetch the file from the remote machine
       debug:
         msg: "{{ file_output }}"
+
+    - name: copy file to remote michane
+      copy:
+        src: "{{ playbook_idr }}/inv.ini"
+        dest: /tmp/inv.ini
+      delegate_to: node1.chaitu.net
