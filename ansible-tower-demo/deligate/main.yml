@@ -42,3 +42,10 @@
           regexp: 'clientID:.*'
           replace: 'clientID: '
       delegate_to : node1.chaitu.net
+
+    - name: Fetch the file from the remote machine
+      fetch:
+        src: /tmp/file.yaml
+        dest: /tmp/file.yaml
+        flat: yes
+      delegate_to: node1.chaitu.net
