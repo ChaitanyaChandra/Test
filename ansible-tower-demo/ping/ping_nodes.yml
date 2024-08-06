@@ -1,0 +1,13 @@
+- name: Ping all hosts
+  hosts: nodes
+  tasks:
+    - name: Ping nodes
+      ping:
+      register: status
+
+    - name: Save status to file
+      local_action:
+        module: copy
+        content: "{{ status | to_nice_yaml }}"
+        dest: /tmp/myfile.txt
+      delegate_to: localhost
