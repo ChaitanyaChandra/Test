@@ -52,3 +52,8 @@
 
     - name: Fetch the file from the remote machine
       shell: cat /tmp/file.yaml
+      register: file_output
+
+    - name: Fetch the file from the remote machine
+      debug:
+        msg: "{{ file_output }}"
