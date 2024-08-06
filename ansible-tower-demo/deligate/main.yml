@@ -12,7 +12,7 @@
         pools: "{{ groups.keys() }}"
 
     - name: generate file from shell
-      shell: echo $(hostname) >  file.txt
+      shell: echo $(uname -a) >  file.txt
       args:
         chdir: "/tmp"
       delegate_to : node1.chaitu.net
