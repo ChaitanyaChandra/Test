@@ -1,0 +1,22 @@
+- name: dict ref
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    one_f_name: chaitanya
+    one_l_name: chandra
+    two_f_name: hari
+    two_l_name: chandra
+    names:
+      one: "{{ one_f_name }} {{ one_l_name }}"
+      two: "{{ two_f_name }} {{ two_l_name }}"
+  tasks:
+    - name: Include debug task
+      include_tasks: debug.yml
+      vars:
+        total_names: "{{ item.value }}"
+      loop: "{{ names | dict2items }}"
+
+    - name: print name one
+      debug:
+        msg: "{{ names.one }}"
