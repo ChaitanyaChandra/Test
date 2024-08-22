@@ -11,3 +11,7 @@
         content: "{{ status | to_nice_yaml }}"
         dest: /tmp/myfile.txt
       delegate_to: localhost
+
+    - name: print name
+      debug:
+        msg: "{{ name }}"
