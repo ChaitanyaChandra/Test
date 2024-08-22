@@ -1,0 +1,15 @@
+- name: concat
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    names:
+      one_f_name: chaitanya
+      one_l_name: chandra
+  tasks:
+    - name: set fact for first set
+      set_fact:
+        mykey: one_f_name
+    - name: print first set using fact
+      debug:
+        msg: "{{ names[mykey] }}"

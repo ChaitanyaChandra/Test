@@ -1,3 +1,4 @@
 - name: print names
   debug:
     msg: "{{ total_names }}"
+  register: "{{ myref }}"
