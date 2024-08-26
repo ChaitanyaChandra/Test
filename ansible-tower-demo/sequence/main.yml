@@ -1,0 +1,13 @@
+- name: seq
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    names:
+      one_f_name: chaitanya
+      one_l_name: chandra
+  tasks:
+    - name: print first set using fact
+      debug:
+        msg: "{{ item }}"
+      loop: "{{ groups.keys() }}"
