@@ -1,0 +1,8 @@
+{% for pool in pools %}
+  {% if pool not in ['all', 'ungrouped'] %}
+  {% set servers = groups[pool] %}
+  {% for server in servers %}
+- address: {{ server }}
+  {% endfor %}
+  {% endif %}
+  {% endfor %}
