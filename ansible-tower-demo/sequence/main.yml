@@ -1,15 +1,30 @@
-- name: seq
+- name: get sequence
   hosts: localhost
   connection: local
   gather_facts: false
-  vars:
   tasks:
-    - name: print first set using fact
+    - name: print sequence
       debug:
         msg: "{{ item }}"
-      loop: "{{ groups['nodepool1'] }}"
+      loop: "{{ groups['node-pool-1']}}"
+
+    - name: template sequence
+      template:
+        src: "template.yml"
+        dest: "{{ playbook_dir }}/generated.yml"
+      vars:
+        pools: "{{ groups.keys() }}"
+
+    - name: read generated file
+      slurp:
+        src: "{{ playbook_dir }}/generated.yml"
+      register: template_data
+
+    - name: print template_sequence
+      debug:
+        msg: "{{ template_data.content | b64decode }}"
 #    - name: generate template file
 #      shell: ansible-playbook generate.yml -i inv.ini
     - name: sleep 10 mins
       pause:
-        minutes: 10
+        minutes: 0
