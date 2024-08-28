@@ -3,6 +3,10 @@
   connection: local
   gather_facts: false
   tasks:
+    - name: Debug Ansible configuration
+      debug:
+        msg: "{{ lookup('env', 'ANSIBLE_CONFIG') }}"
+
     - name: print sequence
       debug:
         msg: "{{ item }}"
