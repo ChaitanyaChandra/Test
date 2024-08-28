@@ -8,3 +8,8 @@
       debug:
         msg: "{{ item }}"
       loop: "{{ groups['nodepool1'] }}"
+#    - name: generate template file
+#      shell: ansible-playbook generate.yml -i inv.ini
+    - name: sleep 10 mins
+      pause:
+        minutes: 10
