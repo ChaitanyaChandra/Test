@@ -1,0 +1,9 @@
+---
+- name: Ensure kernel version is exactly as required
+  hosts: "{{ hosts }}"
+  gather_facts: yes  # Gather facts to get the current kernel version
+
+  tasks:
+    - name: Print current kernel version
+      debug:
+        msg: "Current kernel version is: {{ ansible_kernel }}, required kernel version {{ required_kernel_version }}"
