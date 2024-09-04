@@ -6,7 +6,7 @@ jobs:
   job-one:
     runs-on: ubuntu-latest
     env:
-      string_one: "mynonprd"
+      string_one: "myprd900"
 
     steps:
       - name: incident ticket
