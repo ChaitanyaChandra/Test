@@ -9,19 +9,16 @@
 
     - name: set fact
       ansible.builtin.set_fact:
-        playbook_message: "Current kernel version is: {{ ansible_kernel }}, required kernel version {{ required_kernel_version }}"
+        response: "Current kernel version is: {{ ansible_kernel }}, required kernel version {{ required_kernel_version }}"
         cacheable: yes
       when: ansible_kernel != required_kernel_version
 
+    - name: set fact
+      ansible.builtin.set_fact:
+        response: "insync"
+        cacheable: yes
+      when: ansible_kernel == required_kernel_version
+
     - name: Print
       debug:
-        msg: "{{ playbook_message }}"
-      when: ansible_kernel != required_kernel_version
-
-    - name: make sure success {{ inventory_hostname }}
-      assert:
-        that:
-          ansible_kernel == required_kernel_version
-        fail_msg: "Current kernel version is: {{ ansible_kernel }}, required kernel version {{ required_kernel_version }}"
-        success_msg: "both versions are matching"
-      ignore_errors: true
+        msg: "{{ response }}"
