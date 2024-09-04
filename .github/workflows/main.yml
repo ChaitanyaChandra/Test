@@ -24,4 +24,4 @@ jobs:
         run: echo "stringtwo=from_env" >> $GITHUB_ENV
 
       - name: Test
-        run: echo {{ $string_two }}
+        run: echo ${{ $string_two }}
