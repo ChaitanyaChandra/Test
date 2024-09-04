@@ -1,0 +1,19 @@
+---
+- name: Compare system clock synchronized and NTP status using regex_search
+  hosts: all
+  tasks:
+    - name: Get timedatectl status
+      shell: timedatectl status
+      register: timedatectl_output
+
+    - name: Check if system clock is synchronized and NTP is active using regex
+      set_fact:
+        clock_synchronized: "{{ timedatectl_output.stdout | regex_search('System clock synchronized:\\s*yes') is not none }}"
+        ntp_active: "{{ timedatectl_output.stdout | regex_search('NTP service:\\s*active') is not none }}"
+
+    - name: Print comparison results
+      debug:
+        msg: >
+          System clock synchronized: {{ clock_synchronized }}
+          NTP active: {{ ntp_active }}
+          Status: {{ 'Both system clock is synchronized and NTP is active.' if clock_synchronized and ntp_active else 'Either system clock is not synchronized or NTP is not active.' }}
