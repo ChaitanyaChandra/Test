@@ -13,6 +13,6 @@ jobs:
         if: ${{ contains(env.string_one, 'nonprd') || contains(env.string_one, 'sbx') }}
         run: echo "either conditions are true!"
 
-      - name: Step with or condition
+      - name: change ticket
         if: ${{ !contains(env.string_one, 'nonprd' ) &&  !contains(env.string_one, 'sbx') }}
         run: echo "Both conditions are true!"
