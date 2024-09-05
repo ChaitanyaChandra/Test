@@ -1,31 +1,33 @@
 ---
 - name: Compare system clock synchronized and NTP status using regex_search
   hosts: all
+  vars:
+    system_clock_synchronized: "yes"
+    ntp_service: "active"
+    regex_system_clock_synchronized: "System clock synchronized: {{system_clock_synchronized}}"
+    regex_ntp_service: "NTP service: {{ntp_service}}"
   tasks:
     - name: Get timedatectl status
       shell: timedatectl status
       register: timedatectl_output
 
-    - name: Check if system clock is synchronized and NTP is active using regex
-      set_fact:
-        clock_synchronized: "{{ timedatectl_output.stdout | regex_search('System clock synchronized:\\s*yes') is not none }}"
-        ntp_active: "{{ timedatectl_output.stdout | regex_search('NTP service:\\s*active') is not none }}"
-
-    - name: Print comparison results
-      debug:
-        msg: >
-          System clock synchronized: {{ clock_synchronized }}
-          NTP active: {{ ntp_active }}
-          Status: {{ 'Both system clock is synchronized and NTP is active.' if clock_synchronized and ntp_active else 'Either system clock is not synchronized or NTP is not active.' }}
-
-
-    - name: Extract lines containing 'System clock synchronized' and 'NTP service'
-      set_fact:
-        clock_synchronized_line: "{{ timedatectl_output.stdout | regex_findall('System clock synchronized:*') }}"
-        ntp_service_line: "{{ timedatectl_output.stdout | regex_findall('NTP service:.*') }}"
-
     - name: Print extracted lines
       debug:
         msg:
-          - "System clock synchronized line: {{ clock_synchronized_line }}"
-          - "NTP service line: {{ ntp_service_line }}"
+          - "{{ timedatectl_output.stdout | regex_findall('System clock synchronized:.*') }}"
+          - "{{ timedatectl_output.stdout | regex_findall('NTP service:.*') }}"
+          - "{{ timedatectl_output.stdout | regex_search(regex_system_clock_synchronized) is not none }}"
+          - "{{ timedatectl_output.stdout | regex_search(regex_ntp_service) is not none }}"
+
+    - name: and
+      debug:
+        msg:
+          - "{{ timedatectl_output.stdout | regex_findall('System clock synchronized:.*') }}"
+          - "{{ timedatectl_output.stdout | regex_findall('NTP service:.*') }}"
+      when: timedatectl_output.stdout | regex_search(regex_system_clock_synchronized) is not none and timedatectl_output.stdout | regex_search(regex_ntp_service) is not none
+    - name: or
+      debug:
+        msg:
+          - "{{ timedatectl_output.stdout | regex_findall('System clock synchronized:.*') }}"
+          - "{{ timedatectl_output.stdout | regex_findall('NTP service:.*') }}"
+      when: timedatectl_output.stdout | regex_search(regex_system_clock_synchronized) is none or timedatectl_output.stdout | regex_search(regex_ntp_service) is none
