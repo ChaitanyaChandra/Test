@@ -17,3 +17,15 @@
           System clock synchronized: {{ clock_synchronized }}
           NTP active: {{ ntp_active }}
           Status: {{ 'Both system clock is synchronized and NTP is active.' if clock_synchronized and ntp_active else 'Either system clock is not synchronized or NTP is not active.' }}
+
+
+    - name: Extract lines containing 'System clock synchronized' and 'NTP service'
+      set_fact:
+        clock_synchronized_line: "{{ timedatectl_output.stdout | regex_findall('System clock synchronized:*') }}"
+        ntp_service_line: "{{ timedatectl_output.stdout | regex_findall('NTP service:.*') }}"
+
+    - name: Print extracted lines
+      debug:
+        msg:
+          - "System clock synchronized line: {{ clock_synchronized_line }}"
+          - "NTP service line: {{ ntp_service_line }}"
