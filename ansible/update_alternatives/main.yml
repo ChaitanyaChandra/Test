@@ -1,0 +1,18 @@
+---
+- name: print IPV6
+  hosts: all
+  tasks:
+    - name: Check IPv6 status using sysctl
+      shell: sysctl -a | grep ip6
+      register: ipv6_status
+      ignore_errors: yes
+
+    - name: ipv6 is enabled
+      debug:
+        msg: "no, ipv6 is enabled {{ ipv6_status.stdout_lines }}"
+      when: ipv6_status.rc == 0
+
+    - name: ipv6 is disabled
+      debug:
+        msg: "ipv6 is disabled"
+      when: ipv6_status.rc != 0
