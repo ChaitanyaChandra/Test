@@ -9,6 +9,7 @@ jobs:
 
   job-two:
     runs-on: ubuntu-latest
+    needs: job-one
     steps:
       - name: step-one
         run: exit 0
