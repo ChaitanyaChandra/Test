@@ -1,27 +1,13 @@
 name: Test Workflow
-
 on: workflow_dispatch
-
-env:
-  string_two: "mystringtwo"
-
 jobs:
   job-one:
     runs-on: ubuntu-latest
-    env:
-      string_one: "myprd900"
-
     steps:
-      - name: incident ticket
-        if: ${{ contains(env.string_one, 'nonprd') || contains(env.string_one, 'sbx') }}
-        run: echo "either conditions are true!"
-
-      - name: change ticket
-        if: ${{ !contains(env.string_one, 'nonprd' ) &&  !contains(env.string_one, 'sbx') }}
-        run: echo "Both conditions are true!"
-
-      - name: Set env
-        run: echo "stringtwo=from_env" >> $GITHUB_ENV
-
-      - name: Test
-        run: echo ${{ $string_two }}
+      - name: step-one
+        run: echo hello
+  job-two:
+    runs-on: ubuntu-latest
+    steps:
+      - name: step-two
+        run: exit 1
