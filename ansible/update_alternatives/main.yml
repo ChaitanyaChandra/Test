@@ -1,5 +1,5 @@
 ---
-- name: print IPV6
+- name: update alternatives
   hosts: all
   tasks:
     - name: Check IPv6 status using sysctl
