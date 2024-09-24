@@ -6,13 +6,16 @@ jobs:
     steps:
       - name: step-one
         run: echo hello
+
   job-two:
     runs-on: ubuntu-latest
     steps:
       - name: step-one
-        run: exit 1
+        run: exit 0
+
   job-three:
     runs-on: ubuntu-latest
+    needs: job-two
     steps:
       - name: step-one
         run: echo hi
