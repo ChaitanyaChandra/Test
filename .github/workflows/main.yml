@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: step-one
-        run: echo hello
+        run: sleep 3 ; echo hello
 
   job-two:
     runs-on: ubuntu-latest
@@ -19,4 +19,4 @@ jobs:
     needs: job-two
     steps:
       - name: step-one
-        run: echo hi
+        run: sleep 3 ; echo hi
