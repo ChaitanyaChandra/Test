@@ -9,12 +9,12 @@
   - name: Show DaemonSet info
     debug:
       msg:
-        - "{{ daemonsets_info.resources }}"
+#        - "{{ daemonsets_info.resources }}"
         - "{{ daemonsets_info.resources | length > 0 }}"
 
   - name: Extract container info from DaemonSet
     set_fact:
-      matched_container: "{{ daemonsets_info.resources[0].spec.template.spec.containers | selectattr('name', 'equalto', k8s_container) }}"
+      matched_container: "{{ daemonsets_info.resources[0].spec.template.spec.containers | selectattr('name', 'equalto', k8s_container) | first }}"
     when: "{{ daemonsets_info.resources | length > 0 }}"
 
   - name: print
@@ -23,19 +23,20 @@
     when: "{{ daemonsets_info.resources | length > 0 }}"
 
   - name: no matching daemonset found
-    debug:
-      msg: "no matching daemonset found"
+    set_fact:
+      "{{ k8s_ds_name | replace('-', '_') }}_response" : "no matching daemonset found"
     when: "{{ daemonsets_info.resources | length == 0 }}"
 
-  - name: set fact
+  - name: set fact for insync
     set_fact:
       "{{ k8s_ds_name | replace('-', '_') }}_response" :   "insync"
-#    when: matched_container.image == k8s_image
+    when: daemonsets_info.resources | length > 0 and matched_container.image == k8s_image
 
-#  - name: Convert DaemonSet info to JSON
-#    set_fact:
-#      daemonset_json: "{{ daemonsets_info.resources | to_nice_json }}"
-#
+  - name: set fact for drifted
+    set_fact:
+      "{{ k8s_ds_name | replace('-', '_') }}_response" :   "image is drifted current image: {{ matched_container.image }}, required image: {{ k8s_image }}"
+    when: daemonsets_info.resources | length > 0 and matched_container.image != k8s_image
+
 #  - name: Save DaemonSet info to a file
 #    copy:
 #      content: "{{ daemonset_json }}"

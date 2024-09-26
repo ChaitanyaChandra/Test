@@ -6,7 +6,7 @@
   vars:
      daemon_sets:
       calico-node:
-        namespace: "kube-system"
+        namespace: "kube-systems"
         container: "calico-node"
         image: "docker.io/calico/node:v3.25.1"
       speaker:
