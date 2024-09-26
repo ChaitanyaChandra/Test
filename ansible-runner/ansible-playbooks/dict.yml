@@ -1,0 +1,23 @@
+- name: dict ref
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    daemon_sets:
+      calico-node:
+        namespace: "kube-system"
+        container: "calico-node"
+        image: "docker.io/calico/node:v3.25.1"
+      speaker:
+        namespace: "metallb-system"
+        container: "speaker" # kubectl get ds -n metallb-system  -o jsonpath="{.items[*].spec.template.spec.containers[*].name}"
+        image: "quay.io/metallb/speaker:v0.13.3"
+  tasks:
+    - name: print name one
+      debug:
+        msg:
+          - "name :{{ item.key }}"
+          - "namespace :{{ item.value.namespace }}"
+          - "container: {{ item.value.container }}"
+          - "image : {{ item.value.image }}"
+      loop: "{{ daemon_sets  | dict2items }}"
