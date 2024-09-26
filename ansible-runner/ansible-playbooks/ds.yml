@@ -6,11 +6,11 @@
   vars:
      daemon_sets:
       calico-node:
-        namespace: "kube-systems"
+        namespace: "kube-system"
         container: "calico-node"
         image: "docker.io/calico/node:v3.25.1"
       speaker:
-        namespace: "metallb-systems"
+        namespace: "metallb-system"
         container: "speaker" # kubectl get ds -n metallb-system  -o jsonpath="{.items[*].spec.template.spec.containers[*].name}"
         image: "quay.io/metallb/speaker:v0.13.3"
   tasks:
