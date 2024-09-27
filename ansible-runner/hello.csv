@@ -1,5 +1,5 @@
 nodes,check version
-node1.chaitu.net,insync
-node2.chaitu.net,"Current kernel version is: 5.15.0-202.135.2.el9uek.x86_64, required kernel version 5.15.0-1045-oracle"
+node1.chaitu.net,unreachible
+node2.chaitu.net,unreachible
 node3.chaitu.net,unreachible
 node5.chaitu.net,unreachible
