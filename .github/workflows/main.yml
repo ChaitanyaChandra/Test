@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Save a variable to a file
-        run: echo "MY_PERSISTENT_VAR=Hello, World!" > my_variable.txt
+        run: echo "MY_PERSISTENT_VAR='Hello, World!'" > my_variable.txt
 
       - name: Upload the variable as an artifact
         uses: actions/upload-artifact@v3
