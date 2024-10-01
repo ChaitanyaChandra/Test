@@ -10,7 +10,8 @@ jobs:
       - name: Check if artifact exists
         id: check-artifact
         run: |
-          if [[ $(gh run list --workflow=Persist Environment Variable --status=completed --limit=1 | grep vars_test1) ]]; then
+          # Try to download the artifact to see if it exists
+          if gh actions download-artifact -n vars_test1 --quiet; then
             echo "Artifact exists."
             echo "exists=true" >> $GITHUB_ENV
           else
@@ -22,7 +23,6 @@ jobs:
         if: env.exists == 'false'  # Only run if the artifact does not exist
         run: |
           current_date=$(date)
-          echo $current_date
           echo "snap_date='$current_date'" > vars.txt
 
       - name: Upload the variable as an artifact
