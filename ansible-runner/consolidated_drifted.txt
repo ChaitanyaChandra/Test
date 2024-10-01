@@ -1,0 +1,10 @@
+status_app
+---------------------------
+node2.chaitu.net  drifted
+node5.chaitu.net  drifted
+node4.chaitu.net  not_ok
+
+health_app
+---------------------------
+node1.chaitu.net  drifted
+node4.chaitu.net  fine
