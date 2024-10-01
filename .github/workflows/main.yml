@@ -8,13 +8,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Save a variable to a file
-        run: echo "date='$date'" > my_variable.txt
+        run: |
+          current_date=`date`
+          echo $current_date
+          echo "snap_date='$current_date'" > vars.txt
 
       - name: Upload the variable as an artifact
         uses: actions/upload-artifact@v3
         with:
-          name: test1
-          path: my_variable.txt
+          name: vars_test1
+          path: vars.txt
 
   load-variable:
     runs-on: ubuntu-latest
@@ -23,9 +26,10 @@ jobs:
       - name: Download the artifact
         uses: actions/download-artifact@v3
         with:
-          name: test1
+          name: vars_test1
 
       - name: Load the variable from the file
         run: |
-          source my_variable.txt
-          echo "Loaded variable: $MY_PERSISTENT_VAR"
+          source vars.txt
+          echo `date`
+          echo "Loaded variable: $snap_date"
