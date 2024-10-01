@@ -1,22 +1,31 @@
-name: Test Workflow
-on: workflow_dispatch
+name: Persist Environment Variable
+
+on:
+  workflow_dispatch:
+
 jobs:
-  job-one:
+  save-variable:
     runs-on: ubuntu-latest
     steps:
-      - name: step-one
-        run: date;  echo hello
+      - name: Save a variable to a file
+        run: echo "MY_PERSISTENT_VAR=Hello, World!" > my_variable.txt
 
-  job-two:
-    runs-on: ubuntu-latest
-    needs: job-one
-    steps:
-      - name: step-one
-        run: exit 1
+      - name: Upload the variable as an artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: test1
+          path: my_variable.txt
 
-  job-three:
+  load-variable:
     runs-on: ubuntu-latest
-    needs: job-two
+    needs: save-variable
     steps:
-      - name: step-one
-        run: sleep 3 ; echo hi
+      - name: Download the artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: test1
+
+      - name: Load the variable from the file
+        run: |
+          source my_variable.txt
+          echo "Loaded variable: $MY_PERSISTENT_VAR"
