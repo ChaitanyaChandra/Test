@@ -6,27 +6,38 @@ on:
 jobs:
   save-variable:
     runs-on: ubuntu-latest
+
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download artifact if present
+        id: download-artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: vars_test1
+          path: vars.txt
+          if-no-files-found: ignore
+
       - name: Check if artifact exists
-        id: check-artifact
         run: |
-          # Try to download the artifact to see if it exists
-          if gh run download -n vars_test1 --quiet; then
-            echo "Artifact exists."
-            echo "exists=true" >> $GITHUB_ENV
+          ls
+          if [ -f vars.txt ]; then
+            echo "Artifact found and downloaded."
+            echo "artifacts_exists=true" >> $GITHUB_ENV
           else
-            echo "Artifact does not exist."
-            echo "exists=false" >> $GITHUB_ENV
+            echo "Artifact does not exist"
+            echo "artifacts_exists=false" >> $GITHUB_ENV
           fi
 
       - name: Save a variable to a file
-        if: env.exists == 'false'  # Only run if the artifact does not exist
+        if: env.artifacts_exists == 'false'  # Only run if the artifact does not exist
         run: |
           current_date=$(date)
           echo "snap_date='$current_date'" > vars.txt
 
       - name: Upload the variable as an artifact
-        if: env.exists == 'false'  # Only run if the artifact does not exist
+        if: env.artifacts_exists == 'false'  # Only run if the artifact does not exist
         uses: actions/upload-artifact@v3
         with:
           name: vars_test1
@@ -36,10 +47,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: save-variable
     steps:
-#      - name: Download the artifact
-#        uses: actions/download-artifact@v3
-#        with:
-#          name: vars_test1
 
       - name: Load the variable from the file
         run: |
