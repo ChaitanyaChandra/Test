@@ -7,13 +7,26 @@ jobs:
   save-variable:
     runs-on: ubuntu-latest
     steps:
-      - name: Save a variable to a file
+      - name: Check if artifact exists
+        id: check-artifact
         run: |
-          current_date=`date`
+          if [[ $(gh run list --workflow=Persist Environment Variable --status=completed --limit=1 | grep vars_test1) ]]; then
+            echo "Artifact exists."
+            echo "exists=true" >> $GITHUB_ENV
+          else
+            echo "Artifact does not exist."
+            echo "exists=false" >> $GITHUB_ENV
+          fi
+
+      - name: Save a variable to a file
+        if: env.exists == 'false'  # Only run if the artifact does not exist
+        run: |
+          current_date=$(date)
           echo $current_date
           echo "snap_date='$current_date'" > vars.txt
 
       - name: Upload the variable as an artifact
+        if: env.exists == 'false'  # Only run if the artifact does not exist
         uses: actions/upload-artifact@v3
         with:
           name: vars_test1
