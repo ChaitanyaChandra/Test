@@ -11,7 +11,7 @@ jobs:
         id: check-artifact
         run: |
           # Try to download the artifact to see if it exists
-          if gh actions download-artifact -n vars_test1 --quiet; then
+          if gh run download -n vars_test1 --quiet; then
             echo "Artifact exists."
             echo "exists=true" >> $GITHUB_ENV
           else
@@ -36,10 +36,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: save-variable
     steps:
-      - name: Download the artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: vars_test1
+#      - name: Download the artifact
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: vars_test1
 
       - name: Load the variable from the file
         run: |
