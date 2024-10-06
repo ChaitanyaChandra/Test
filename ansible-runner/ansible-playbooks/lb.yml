@@ -62,13 +62,17 @@
     - name: MetalLB filtering pods jinja
       set_fact:
         metallb_filtered_pods_jinja: >-
-          {%- set pods = [] -%}
+          {%- set nodes = [] -%}
           {%- for pod in metallb_pods.resources -%}
-            {%- if pod.spec.nodeName in nodes_list %}
-              {%- set _ = pods.append(pod.spec.nodeName) -%}
+            {%- if pod.spec.nodeName not in nodes_list %}
+              {%- set _ = nodes.append(pod.spec.nodeName) -%}
             {%- endif %}
           {%- endfor -%}
-          {{ pods }} nodes are ok
+          {%- if nodes | length == 0 -%}
+            insync
+          {%- else -%}
+            {{ nodes }} nodes are not ok
+          {%- endif %}
 
 
     - name: Print filtered MetalLB running pods list
