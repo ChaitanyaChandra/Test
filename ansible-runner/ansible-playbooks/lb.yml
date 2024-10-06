@@ -1,0 +1,7 @@
+- name: deployment set fact
+  set_fact:
+    "{{ item.key }}_namespace":  "{{ item.value.namespace }}"
+    "{{ item.key }}_container": "{{ item.value.container }}"
+    "{{ item.key }}_image" : "{{ item.value.image }}"
+    catchable: yes
+  loop: "{{ deployment  | dict2items }}"

@@ -1,0 +1,21 @@
+- name: dict ref
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    cluster: "cluster1"
+    cluster1:
+      lb1: "node.kubernetes.io/microk8s-controlplane=microk8s-controlplane"
+    cluster2:
+      lb1: "na=na"
+  tasks:
+    - name: Print the value dynamically based on cluster
+      debug:
+        msg:
+          - "{{ vars[cluster]['lb1'] }}"
+
+
+
+#    -  name: include dedicated node
+#       include_tasks:
+#         file: lb.yml
