@@ -2,29 +2,32 @@
   hosts: localhost
   connection: local
   gather_facts: false
+
   vars:
-    cluster: "cluster1"
+    cluster: "cluster3"
+
     clusters_set_one:
       mainclusters: ["cluster1", "cluster2"]
       lb1: "node.kubernetes.io/microk8s-controlplane=microk8s-controlplane"
+
     clusters_set_two:
       mainclusters: ["cluster3", "cluster4"]
       lb1: "na=na"
+
   tasks:
     - name: Set fact based on cluster set
       set_fact:
         lb1_value: >-
-          {% if cluster in clusters_set_one.mainclusters %}
+          {% if cluster in clusters_set_one.mainclusters -%}
             {{ clusters_set_one.lb1 }}
-          {% elif cluster in clusters_set_two.mainclusters %}
+          {% elif cluster in clusters_set_two.mainclusters -%}
             {{ clusters_set_two.lb1 }}
-          {% else %}
-            "Cluster not found in any set"
-          {% endif %}
+          {%- endif %}
 
     - name: Print the set fact value
       debug:
         msg: "{{ lb1_value }}"
+
 
 #    - name: Print the value dynamically based on cluster
 #      debug:
