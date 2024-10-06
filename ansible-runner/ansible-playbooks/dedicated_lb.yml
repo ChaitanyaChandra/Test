@@ -33,9 +33,3 @@
 #      debug:
 #        msg:
 #          - "{{ vars[cluster]['lb1'] }}"
-
-
-
-#    -  name: include dedicated node
-#       include_tasks:
-#         file: lb.yml
