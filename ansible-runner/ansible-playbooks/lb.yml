@@ -1,7 +1,79 @@
-- name: deployment set fact
-  set_fact:
-    "{{ item.key }}_namespace":  "{{ item.value.namespace }}"
-    "{{ item.key }}_container": "{{ item.value.container }}"
-    "{{ item.key }}_image" : "{{ item.value.image }}"
-    catchable: yes
-  loop: "{{ deployment  | dict2items }}"
+- name: dict ref
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    lb1: "node.kubernetes.io/microk8s-controlplane=microk8s-controlplane"
+
+  tasks:
+    - name: Get node details with label filter
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Node
+        label_selectors:
+          - "{{ lb1 }}"
+      register: node_info
+
+    - name: Set nodes list
+      set_fact:
+        nodes_list: "{{ node_info.resources | map(attribute='metadata.name') | list }}"
+
+    - name: Get MetalLB pods running on the nodes
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Pod
+        namespace: metallb-system
+      register: metallb_pods
+
+    - name: Print pod name and node name
+      debug:
+        msg: "{{ item.metadata.name }} is running on {{ item.spec.nodeName }}"
+      loop: "{{ metallb_pods.resources }}"
+
+
+    - name: Create a dictionary mapping pod names to node names
+      set_fact:
+        metallb_running_pods: "{{ metallb_running_pods | default([]) + [{'pod_name': item.metadata.name, 'node_name': item.spec.nodeName}] }}"
+      loop: "{{ metallb_pods.resources }}"
+
+    - name: Print MetalLB running pods dictionary
+      debug:
+        var: metallb_running_pods
+
+    - name:  MetalLB running pods jinja
+      set_fact:
+        metallb_running_pods_jinja: >-
+          {%- set pods = [] -%}
+          {%- for pod in metallb_pods.resources -%}
+             {%- set _ = pods.append({'pod_name': pod.metadata.name, 'node_name': pod.spec.nodeName}) -%}
+          {%- endfor -%}
+          {{ pods }} 
+
+    - name:  filtering nodes jinja
+      set_fact:
+        metallb_filtered_nodes_jinja: >-
+          {%- set filtered_nodes = [] -%}
+          {%- for node in nodes_list -%}
+            {%- set _ = filtered_nodes.append(node) -%}
+          {%- endfor -%}
+          {{ filtered_nodes }} 
+
+    - name: MetalLB filtering pods jinja
+      set_fact:
+        metallb_filtered_pods_jinja: >-
+          {%- set pods = [] -%}
+          {%- for pod in metallb_pods.resources -%}
+            {%- if pod.spec.nodeName in nodes_list %}
+              {%- set _ = pods.append(pod.spec.nodeName) -%}
+            {%- endif %}
+          {%- endfor -%}
+          {{ pods }} nodes are ok
+
+
+    - name: Print filtered MetalLB running pods list
+      debug:
+        msg:
+         - "metallb_running_pods_jinja: {{ metallb_running_pods_jinja }}"
+         - "metallb_filtered_nodes_jinja {{metallb_filtered_nodes_jinja}}"
+         - "metallb_filtered_pods_jinja: {{ metallb_filtered_pods_jinja }}"
