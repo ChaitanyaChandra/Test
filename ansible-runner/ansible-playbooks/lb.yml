@@ -71,7 +71,7 @@
           {%- if nodes | length == 0 -%}
             insync
           {%- else -%}
-            {{ nodes }} nodes are not ok
+            {{ nodes }} nodes loadbalancer pods are running without {{ lb1 }} label to the nodes
           {%- endif %}
 
 
