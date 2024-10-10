@@ -1,0 +1,13 @@
+- name: Append new_nodes to the end of the file
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  vars:
+    nodes: ["node_one", "node_two", "node_three"]
+  tasks:
+    - name: Insert new_nodes at the end of the file
+      blockinfile:
+        path: "{{ playbook_dir }}/file.txt"
+        marker: ""
+        block: "iac_new_nodes_{{ ansible_date_time.date }}: {{ nodes | join(', ') }}"
+        insertafter: EOF
