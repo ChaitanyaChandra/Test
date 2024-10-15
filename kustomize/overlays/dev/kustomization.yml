@@ -10,3 +10,4 @@ nameSuffix: -kustomize-dev
 
 patches:
   - path: service-port.yml
+  - path: service-port2.yml
