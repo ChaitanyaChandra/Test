@@ -1,0 +1,22 @@
+- name: run local
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: yes
+  tasks:
+
+    - name: set fact 
+      set_fact:
+        f_name: chaitanya1
+
+    - name: decouple name and number
+      set_fact:
+        name: "{{ f_name | regex_replace('[0-9]+$', '') }}"
+        number: "{{ '%03d' | format(f_name | regex_search('[0-9]+$') | int) }}"
+
+    - name: print decoupled values
+      debug:
+        msg:
+          - "Name: {{ name }}"
+          - "Number: {{ number }}"
+
