@@ -1,6 +1,6 @@
 resources:
   - ../../base
-
+  - svc.yml
 replicas:
   - name: nginx-deployment
     count: 1
@@ -10,4 +10,3 @@ nameSuffix: -kustomize-dev
 
 patches:
   - path: service-port.yml
-  - path: service-port2.yml
