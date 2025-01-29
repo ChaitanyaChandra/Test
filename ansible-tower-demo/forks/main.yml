@@ -3,4 +3,4 @@
   hosts: nodes
   tasks:
     - ansible.builtin.shell:
-      cmd: sleep 30
+        cmd: sleep 30
