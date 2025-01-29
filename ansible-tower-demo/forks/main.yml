@@ -1,5 +1,6 @@
 - name: forks
-  gather_facts: false
+  gather_facts: false\
+  hosts: nodes
   tasks:
     - ansible.builtin.shell:
       cmd: sleep 30
