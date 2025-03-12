@@ -3,7 +3,7 @@
   connection: local
   gather_facts: false
   vars:
-    nodes: ["node1.durgasri.com", "node2.durgasri.com", "node1.chaitu.net", "node2.chaitu.net", "node3.chaitu.net"]  # List of nodes
+    nodes: ["node1", "node2", "node3"]  # List of nodes
 
   tasks:
 
