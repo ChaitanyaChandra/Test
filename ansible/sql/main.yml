@@ -1,0 +1,25 @@
+- name: Setup SQL Connection and Query Database
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    nodes: ["node1.durgasri.com", "node2.durgasri.com", "node1.chaitu.net", "node2.chaitu.net", "node3.chaitu.net"]  # List of nodes
+
+  tasks:
+
+    - name: Generate list in sql format name
+      set_fact:
+        mysql_nodes_list: "{{ nodes | map('regex_replace', '^(.*)$', \"'\\1'\") | join(', ') }}"
+
+    - name: Run MySQL Query for all nodes at once
+      community.mysql.mysql_query:
+        login_host:
+        login_user:
+        login_password: ""
+        login_db: test_db
+        query: "UPDATE test_table SET status='added' WHERE dns_name IN ({{ mysql_nodes_list }});"
+      register: query_result
+
+    - name: Print Query Result
+      debug:
+        var: query_result
