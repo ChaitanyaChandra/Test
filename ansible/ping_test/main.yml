@@ -1,0 +1,12 @@
+- name: wait for connection active
+  hosts: all
+  gather_facts: false
+  become: false
+  tasks:
+
+    - name: wait for connection active
+      ansible.builtin.wait_for_connection:
+        sleep: 10
+        timeout: 60
+#        sleep: 180
+#        timeout: 3600
