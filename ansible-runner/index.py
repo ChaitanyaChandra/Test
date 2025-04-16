@@ -79,9 +79,29 @@ for cluster in clusters:
 
     generate_consolidated_file()
 
+    # For each system check, calculate drift summary
+    cluster_statuses = []
+    for item in system_csv_col.values():
+        total_nodes = system_df.shape[0]
+        insync_count = (system_df[item] == "insync").sum()
+        drifted_count = total_nodes - insync_count
 
+        if drifted_count == 0:
+            status = "insync"
+        else:
+            status = f"drifted ({drifted_count} node{'s' if drifted_count > 1 else ''})"
+
+        cluster_statuses.append(status)
+
+    # Add this cluster's status column to global_system_df
+    global_system_df[cluster] = cluster_statuses
+    global_system_df[cluster] = global_system_df[cluster].apply(
+        lambda x: f'<span style="color:red;">{x}</span>' if str(x).startswith("drifted") else x
+    )
+
+print(global_system_df)
 ###################### SEND EMAIL  ##################################
-k8s_table = global_system_df.to_html(index=False)
+k8s_table = global_system_df.to_html(escape=False, index=False)
 folder_path = f"{pwd}/files/consolidated/"
 zip_name = 'attachments.zip'
 body_data = f"<p>Please find the summary of drifted configuration information.</p>"
@@ -103,5 +123,5 @@ body = f"""
 folder_path = f"{pwd}/files/consolidated/"
 zip_name = 'attachments.zip'
 send_email.zip_txt_files(folder_path, zip_name)
-# send_email.send_email(zip_name, body)
+send_email.send_email(zip_name, body)
 
