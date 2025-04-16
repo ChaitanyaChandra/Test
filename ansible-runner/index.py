@@ -11,7 +11,7 @@ import send_email
 pwd = os.getcwd()
 
 drifted_clusters = set()
-isquiet = False
+isquiet = True
 
 system_csv_col = {
     "os_version_check" : "RedHat OS Version status",
