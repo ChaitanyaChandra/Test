@@ -1,1 +1,0 @@
-{"event": "verbose", "uuid": "ed2e96da-ada6-4e03-b241-d953d00a7b5a", "counter": 12, "stdout": "\u001b[1;35m[WARNING]: Platform linux on host node1.durgasri.com is using the discovered\u001b[0m", "start_line": 10, "end_line": 11, "runner_ident": "6bcafeaa-2b7a-4ed1-9bf6-53c463044c9d", "created": "2025-04-16T14:20:38.233800+00:00"}
