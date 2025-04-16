@@ -3,19 +3,19 @@
   connection: local
   gather_facts: false
   vars:
-    nodes: ["node1", "node2", "node3"]  # List of nodes
+    nodes: ["node1.durgasri.com", "node2.durgasri.com", "node1.chaitu.net", "node2.chaitu.net", "node3.chaitu.net"]  # List of nodes
 
   tasks:
 
-    - name: Generate list in sql format name
+    - name: Generate comma-separated string with single quotes
       set_fact:
         mysql_nodes_list: "{{ nodes | map('regex_replace', '^(.*)$', \"'\\1'\") | join(', ') }}"
 
     - name: Run MySQL Query for all nodes at once
       community.mysql.mysql_query:
-        login_host:
-        login_user:
-        login_password: ""
+        login_host: master.chaitu.net
+        login_user: chaitu
+        login_password: "123Chaitu"
         login_db: test_db
         query: "UPDATE test_table SET status='added' WHERE dns_name IN ({{ mysql_nodes_list }});"
       register: query_result
