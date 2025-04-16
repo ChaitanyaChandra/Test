@@ -1,0 +1,66 @@
+
+PLAY [Ensure kernel version is exactly as required] ****************************
+
+TASK [Gathering Facts] *********************************************************
+[1;35mcore/2.18/reference_appendices/interpreter_discovery.html for more information.[0m
+[0;32mok: [main.durgasri.com][0m
+[1;35mcore/2.18/reference_appendices/interpreter_discovery.html for more information.[0m
+[0;32mok: [node1.durgasri.com][0m
+
+TASK [Include kernal task] *****************************************************
+[0;36mincluded: /Users/chaitanya/PycharmProjects/test/ansible-runner/ansible-playbooks/kernal_task.yml for main.durgasri.com, node1.durgasri.com[0m
+
+TASK [Print current kernel version] ********************************************
+[0;32mok: [main.durgasri.com] => {[0m
+[0;32m    "msg": "Current kernel version is: 5.15.0-1045-oracle, required kernel version 5.15.0-1045-oracle"[0m
+[0;32m}[0m
+[0;32mok: [node1.durgasri.com] => {[0m
+[0;32m    "msg": "Current kernel version is: 5.15.0-1045-oracle, required kernel version 5.15.0-1045-oracle"[0m
+[0;32m}[0m
+
+TASK [set fact] ****************************************************************
+[0;36mskipping: [main.durgasri.com][0m
+[0;36mskipping: [node1.durgasri.com][0m
+
+TASK [set fact] ****************************************************************
+[0;32mok: [main.durgasri.com][0m
+[0;32mok: [node1.durgasri.com][0m
+
+TASK [Print] *******************************************************************
+[0;32mok: [main.durgasri.com] => {[0m
+[0;32m    "msg": "insync"[0m
+[0;32m}[0m
+[0;32mok: [node1.durgasri.com] => {[0m
+[0;32m    "msg": "insync"[0m
+[0;32m}[0m
+
+TASK [include os task] *********************************************************
+[0;36mincluded: /Users/chaitanya/PycharmProjects/test/ansible-runner/ansible-playbooks/os_version_check.yml for main.durgasri.com, node1.durgasri.com[0m
+
+TASK [Print current os version] ************************************************
+[0;32mok: [main.durgasri.com] => {[0m
+[0;32m    "msg": "Current OS version is: 22.04, required OS version 22"[0m
+[0;32m}[0m
+[0;32mok: [node1.durgasri.com] => {[0m
+[0;32m    "msg": "Current OS version is: 22.04, required OS version 22"[0m
+[0;32m}[0m
+
+TASK [set fact] ****************************************************************
+[0;32mok: [main.durgasri.com][0m
+[0;32mok: [node1.durgasri.com][0m
+
+TASK [set fact] ****************************************************************
+[0;36mskipping: [main.durgasri.com][0m
+[0;36mskipping: [node1.durgasri.com][0m
+
+TASK [Print] *******************************************************************
+[0;32mok: [main.durgasri.com] => {[0m
+[0;32m    "msg": "Current OS version is: 22.04, required OS version 22"[0m
+[0;32m}[0m
+[0;32mok: [node1.durgasri.com] => {[0m
+[0;32m    "msg": "Current OS version is: 22.04, required OS version 22"[0m
+[0;32m}[0m
+
+PLAY RECAP *********************************************************************
+[0;32mmain.durgasri.com[0m          : [0;32mok=9   [0m changed=0    unreachable=0    failed=0    [0;36mskipped=2   [0m rescued=0    ignored=0   
+[0;32mnode1.durgasri.com[0m         : [0;32mok=9   [0m changed=0    unreachable=0    failed=0    [0;36mskipped=2   [0m rescued=0    ignored=0   

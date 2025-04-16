@@ -1,24 +1,10 @@
 ---
 - name: Ensure kernel version is exactly as required
   hosts: "{{ my_hosts }}"
-  gather_facts: yes
+  gather_facts: true
   tasks:
-    - name: Print current kernel version
-      debug:
-        msg: "Current kernel version is: {{ ansible_kernel }}, required kernel version {{ required_kernel_version }}"
+    - name: Include kernal task
+      ansible.builtin.include_tasks: kernal_task.yml
 
-    - name: set fact
-      ansible.builtin.set_fact:
-        response: "Current kernel version is: {{ ansible_kernel }}, required kernel version {{ required_kernel_version }}"
-        cacheable: yes
-      when: ansible_kernel != required_kernel_version
-
-    - name: set fact
-      ansible.builtin.set_fact:
-        response: "insync"
-        cacheable: yes
-      when: ansible_kernel == required_kernel_version
-
-    - name: Print
-      debug:
-        msg: "{{ response }}"
+    - name: include os task
+      ansible.builtin.include_tasks: os_version_check.yml

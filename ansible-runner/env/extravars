@@ -1,2 +1,3 @@
 ---
 required_kernel_version: "5.15.0-1045-oracle"
+required_ansible_distribution_version: "22"

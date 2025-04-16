@@ -1,0 +1,19 @@
+  - name: Print current os version
+    debug:
+      msg: "Current OS version is: {{ ansible_distribution_version }}, required OS version {{ required_ansible_distribution_version }}"
+
+  - name: set fact
+    ansible.builtin.set_fact:
+      os_version_check_response: "Current OS version is: {{ ansible_distribution_version }}, required OS version {{ required_ansible_distribution_version }}"
+      cacheable: yes
+    when: ansible_distribution_version != required_ansible_distribution_version
+
+  - name: set fact
+    ansible.builtin.set_fact:
+      os_version_check_response: "insync"
+      cacheable: yes
+    when: ansible_distribution_version == required_ansible_distribution_version
+
+  - name: Print
+    debug:
+      msg: "{{ os_version_check_response }}"

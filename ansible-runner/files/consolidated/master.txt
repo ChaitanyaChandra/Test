@@ -1,0 +1,11 @@
+
+
+RedHat OS Version status
+-----------------------------------------------------------
+master.chaitu.net --> Current OS version is: 22.04, required OS version 22
+node1.chaitu.net --> Current OS version is: 22.04, required OS version 22
+
+
+kernel status
+-----------------------------------------------------------
+master.chaitu.net --> Current kernel version is: 6.5.0-1027-oracle, required kernel version 5.15.0-1045-oracle

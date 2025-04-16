@@ -1,0 +1,19 @@
+  - name: Print current kernel version
+    debug:
+      msg: "Current kernel version is: {{ ansible_kernel }}, required kernel version {{ required_kernel_version }}"
+
+  - name: set fact
+    ansible.builtin.set_fact:
+      kernel_check_response: "Current kernel version is: {{ ansible_kernel }}, required kernel version {{ required_kernel_version }}"
+      cacheable: yes
+    when: ansible_kernel != required_kernel_version
+
+  - name: set fact
+    ansible.builtin.set_fact:
+      kernel_check_response: "insync"
+      cacheable: yes
+    when: ansible_kernel == required_kernel_version
+
+  - name: Print
+    debug:
+      msg: "{{ kernel_check_response }}"
