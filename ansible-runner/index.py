@@ -80,7 +80,7 @@ for cluster in clusters:
     generate_consolidated_file()
 
     # For each system check, calculate drift summary
-    cluster_statuses = []
+    status_dict = {}
     for item in system_csv_col.values():
         total_nodes = system_df.shape[0]
         insync_count = (system_df[item] == "insync").sum()
@@ -91,10 +91,11 @@ for cluster in clusters:
         else:
             status = f"drifted ({drifted_count} node{'s' if drifted_count > 1 else ''})"
 
-        cluster_statuses.append(status)
+        status_dict[item] = status
 
-    # Add this cluster's status column to global_system_df
-    global_system_df[cluster] = cluster_statuses
+    # Map this dict to the global dataframe's 'items' column
+    global_system_df[cluster] = global_system_df["items"].map(status_dict)
+
     global_system_df[cluster] = global_system_df[cluster].apply(
         lambda x: f'<span style="color:red;">{x}</span>' if str(x).startswith("drifted") else x
     )

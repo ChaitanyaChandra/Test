@@ -1,3 +1,4 @@
 .count
 /ansible-runner/attachments.zip
 /ansible-runner/artifacts/
+/ansible-runner/__pycache__/
