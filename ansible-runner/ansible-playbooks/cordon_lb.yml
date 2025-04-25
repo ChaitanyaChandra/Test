@@ -1,0 +1,55 @@
+- name: dict ref
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    lb1: "node.kubernetes.io/microk8s-controlplane=microk8s-controlplane"
+
+  tasks:
+    - name: Get node details with label filter
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Node
+        label_selectors:
+          - "{{ lb1 }}"
+      register: node_info
+
+    - name: Set nodes list
+      set_fact:
+        nodes_list: "{{ node_info.resources | map(attribute='metadata.name') | list }}"
+
+    - name: Get cordoned nodes from the list
+      set_fact:
+        cordoned_nodes: >-
+          {{
+            node_info.resources
+            | selectattr('spec.unschedulable', 'defined')
+            | selectattr('spec.unschedulable', 'equalto', true)
+            | map(attribute='metadata.name')
+            | list
+          }}
+
+    - name:  filtering nodes jinja
+      set_fact:
+        filtered_nodes_jinja: >-
+          {%- set filtered_nodes = [] -%}
+          {%- for node in nodes_list -%}
+              {%- if node not in cordoned_nodes %}
+                {%- set _ = filtered_nodes.append(node) -%}
+              {%- endif %}
+          {%- endfor -%}
+          {%- if filtered_nodes | length == 0  %}
+            insync
+          {%- else -%}
+            metallb nodes, {{ filtered_nodes }} not cordoned          
+          {%- endif %}          
+
+
+
+    - name: Print filtered MetalLB running pods list
+      debug:
+        msg:
+         - "cordoned nodes :{{ cordoned_nodes }}"
+         - "filtered uncordon nodes :{{filtered_nodes_jinja}}"
+         - "all nodes :{{ nodes_list }}"
