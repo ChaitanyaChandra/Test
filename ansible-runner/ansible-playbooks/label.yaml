@@ -1,0 +1,22 @@
+- name: Get Kubernetes namespaces as a list
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Get namespaces with label prm.managed=false
+      k8s_info:
+        api_version: v1
+        kind: Namespace
+        kubeconfig: "/Users/chaitanya/.kube/main/config"
+        label_selectors:
+          - "prm.managed=false"
+      register: ns_output
+
+    - name: Extract namespace names into a list
+      set_fact:
+        ns_list: "{{ ns_output.resources | map(attribute='metadata.name') | list }}"
+
+    - name: Show namespace list
+      debug:
+        var: ns_list

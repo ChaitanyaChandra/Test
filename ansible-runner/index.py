@@ -19,7 +19,7 @@ system_csv_col = {
 }
 
 cluster_nodes = {
-    'main' : ["main.durgasri.com", "node1.durgasri.com"],
+    'main' : ["cp.durgasri.in", "node1.durgasri.in", "node2.durgasri.in"],
     'master' : ["master.chaitu.net", "node1.chaitu.net"]
 }
 
