@@ -2,6 +2,8 @@
   hosts: localhost
   connection: local
   gather_facts: false
+  vars:
+    system_ns: ["kube-system", "kube-public", "kube-metrics-system"]
 
   tasks:
     - name: Get namespaces with label prm.managed=false
@@ -17,6 +19,10 @@
       set_fact:
         ns_list: "{{ ns_output.resources | map(attribute='metadata.name') | list }}"
 
-    - name: Show namespace list
+    - name: Filter out excluded namespaces
+      set_fact:
+        filtered_ns: "{{ ns_list | difference(system_ns) }}"
+
+    - name: Show final filtered namespaces
       debug:
-        var: ns_list
+        var: filtered_ns
