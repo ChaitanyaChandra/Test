@@ -1,7 +1,7 @@
 import re
 import sys
 
-EMAIL_REGEX = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
+EMAIL_REGEX = re.compile(r"^[a-zA-Z0-9_.+-]+@gmail.com")
 
 def valid_email(email):
     if EMAIL_REGEX.match(email):
