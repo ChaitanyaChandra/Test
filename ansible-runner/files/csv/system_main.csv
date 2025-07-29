@@ -1,3 +1,4 @@
 main Nodes,RedHat OS Version status,kernel status
-main.durgasri.com,"Current OS version is: 22.04, required OS version 22",insync
-node1.durgasri.com,"Current OS version is: 22.04, required OS version 22",insync
+cp.durgasri.in,unreachable,unreachable
+node1.durgasri.in,unreachable,unreachable
+node2.durgasri.in,unreachable,unreachable

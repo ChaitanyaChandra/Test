@@ -2,10 +2,13 @@
 
 RedHat OS Version status
 -----------------------------------------------------------
-main.durgasri.com --> Current OS version is: 22.04, required OS version 22
-node1.durgasri.com --> Current OS version is: 22.04, required OS version 22
+cp.durgasri.in --> unreachable
+node1.durgasri.in --> unreachable
+node2.durgasri.in --> unreachable
 
 
 kernel status
 -----------------------------------------------------------
-insync
+cp.durgasri.in --> unreachable
+node1.durgasri.in --> unreachable
+node2.durgasri.in --> unreachable

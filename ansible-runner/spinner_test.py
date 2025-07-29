@@ -2,7 +2,11 @@ from halo import Halo
 import time
 
 def process_command():
-    time.sleep(5)  # Simulate a long-running command
+    EMAIL_TO = ['majorchowdary@gmail.com']
+    EMAIL_SPACE = ", "
+    msg = EMAIL_SPACE.join(EMAIL_TO)
+    print(msg)
+    time.sleep(1)
 
 spinner = Halo(text='Processing...', spinner='dots')  # You can change the spinner style
 spinner.start()
