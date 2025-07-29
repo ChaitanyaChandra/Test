@@ -3,7 +3,7 @@ import time
 from datetime import datetime
 
 # Generate timestamp in desired format
-timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M')
+timestamp = datetime.now().strftime('%d-%b-%Y_%I-%M-%p')
 
 def process_command():
     EMAIL_TO = ['majorchowdary@gmail.com']
