@@ -15,7 +15,7 @@ SMTP_PORT = 587
 SMTP_USERNAME = "chandrachaitanya01@gmail.com"
 SMTP_PASSWORD = "oquu qruh zqlv dhmg"
 
-EMAIL_TO = ['majorchowdary@gmail.com', 'ChandraChaitanya@icloud.com']
+EMAIL_TO = ['ChandraChaitanya@icloud.com']
 EMAIL_FROM = "Chaitanya<chandrachaitanya01@gmail.com>"
 EMAIL_SUBJECT = "Demo Email : "
 
