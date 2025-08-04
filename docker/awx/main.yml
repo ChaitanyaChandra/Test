@@ -13,3 +13,14 @@ images:
     newTag: v0.15.0
 
 namespace: awx
+
+patches:
+  - target:
+      kind: Deployment
+      name: awx-operator-controller-manager
+    patch: |-
+      - op: add
+        path: /spec/template/spec/imagePullSecrets
+        value:
+        - name: regcred
+
