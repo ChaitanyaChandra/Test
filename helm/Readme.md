@@ -15,4 +15,11 @@ helm delete spec -n test
 
 # update
 helm upgrade spec spec-app -n test
+
+# history 
+helm history spec -n test
+
+
+# rollback
+helm rollback spec -n test 5
 ```
