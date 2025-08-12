@@ -15,12 +15,13 @@ spec:
     spec:
       containers:
       - name: webhook-app
+        imagePullPolicy: Always  # <--- Add this line to always pull the image
         image: chaitanyachandra/webhook:arm_latest
         ports:
         - containerPort: 443
         volumeMounts:
         - name: webhook-certs
-          mountPath: "/app"
+          mountPath: "/mnt/certs/"
           readOnly: true
       volumes:
       - name: webhook-certs

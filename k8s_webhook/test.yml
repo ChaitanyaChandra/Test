@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webhook-test-pod
+  namespace: webhook
+  labels:
+    app: webhook-app
+spec:
+  containers:
+  - name: webhook-app
+    image: chaitanyachandra/webhook:arm_latest
+    imagePullPolicy: Always
+    command: ["sleep", "3600"]
+    ports:
+    - containerPort: 443
+    volumeMounts:
+    - name: webhook-certs
+      mountPath: "/mnt/certs/app"
+      readOnly: true
+  volumes:
+  - name: webhook-certs
+    secret:
+      secretName: webhook-tls-secret
