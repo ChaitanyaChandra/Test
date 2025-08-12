@@ -6,6 +6,11 @@ docker build -t docker.io/chaitanyachandra/kube-rbac-proxy:v0.15.0  -t docker.io
 docker push docker.io/chaitanyachandra/kube-rbac-proxy:v0.15.0
 docker push docker.io/chaitanyachandra/kube-rbac-proxy:latest
 
+
+docker build -t docker.io/chaitanyachandra/app:1.0  -t docker.io/chaitanyachandra/app:latest .
+docker push docker.io/chaitanyachandra/app:1.0
+docker push docker.io/chaitanyachandra/app:latest
+
 kubectl create secret docker-registry regcred \
   --docker-server=https://index.docker.io/v1/ \
   --docker-username=<your-dockerhub-username> \
