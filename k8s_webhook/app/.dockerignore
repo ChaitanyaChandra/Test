@@ -1,0 +1,48 @@
+# Git repository files
+.git
+.gitignore
+
+# Python cache and environments
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+.env
+
+# Logs and coverage reports
+*.log
+.coverage
+.coverage.*
+
+# Test and build artifacts
+.tox
+.coverage
+.cache
+.nosetests.xml
+coverage.xml
+
+# IDE and editor configuration
+.vscode
+.idea
+*.swp
+
+# Docker files that are not needed inside image
+Dockerfile
+docker-compose.yml
+
+# Other unnecessary files
+*.md
+README.md
+*.conf
+
+# Secrets and credentials
+.aws
+.ssh
+.env
+
+# Mac OS files, others
+.DS_Store
