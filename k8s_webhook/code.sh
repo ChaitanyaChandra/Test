@@ -16,3 +16,7 @@ mv webhook-server.key tls.key
 
 # Encode CA cert for kubernetes webhook YAML
 cat ca.crt | base64 | tr -d '\n' > ca_bundle.txt
+
+docker build -t docker.io/chaitanyachandra/webhook:arm_1.0  -t docker.io/chaitanyachandra/webhook:arm_latest .
+docker push docker.io/chaitanyachandra/webhook:arm_1.0
+docker push docker.io/chaitanyachandra/webhook:arm_latest
