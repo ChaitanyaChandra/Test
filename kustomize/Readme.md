@@ -14,7 +14,7 @@ helm install spec -n test spec-app
 helm delete spec -n test 
 
 # update
-helm upgrade spec -n test
+helm upgrade spec spec-app -n test
 
 # history 
 helm history spec -n test

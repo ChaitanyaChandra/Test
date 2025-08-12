@@ -1,0 +1,12 @@
+resources:
+  - ../../base
+  - svc.yml
+replicas:
+  - name: nginx-deployment
+    count: 1
+namespace: dev
+
+nameSuffix: -kustomize-dev
+
+patches:
+  - path: service-port.yml
