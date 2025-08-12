@@ -10,7 +10,8 @@ openssl req -new -key webhook-server.key -subj "/CN=webhook-service.webhook.svc"
 openssl req -x509 -newkey rsa:4096 -sha256 -days 10000 -nodes -keyout ca.key -out ca.crt -subj "/CN=webhook-service.webhook.svc"
 
 # Sign the webhook server CSR with the CA
-openssl x509 -req -in webhook-server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out webhook-server.crt -days 10000 -sha256
+openssl x509 -req -in webhook-server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out webhook-server.crt -days 10000 -sha256 -extensions v3_req -extfile csr.conf
+
 
 # mv cert and key as tls.crt and tls.key
 mv webhook-server.crt tls.crt
