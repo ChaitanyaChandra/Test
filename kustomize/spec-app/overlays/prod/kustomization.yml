@@ -1,12 +1,30 @@
 resources:
+  - ns.yml
   - ../../base
 
 replicas:
-  - name: nginx-deployment
+  - name: spec-deployment
     count: 3
 namespace: prod
 
 nameSuffix: -kustomize-prod
 
+labels:
+- includeSelectors: false
+  pairs:
+    env: prod
+
 patches:
-  - path: service-port.yml
+- target:
+    group: networking.k8s.io
+    version: v1
+    kind: Ingress
+    name: spec-ingress
+  path: patch-ingress.json
+
+- target:
+    group: networking.k8s.io
+    version: v1
+    kind: Ingress
+    name: spec-health-ingress
+  path: patch-health-ingress.json

@@ -2,5 +2,10 @@ resources:
   - main.yml
   - ingress.yml
 
-commonLabels:
+commonAnnotations:
   managedby: spec-app-kustomize
+
+labels:
+- includeSelectors: false
+  pairs:
+    owner: chaitanya

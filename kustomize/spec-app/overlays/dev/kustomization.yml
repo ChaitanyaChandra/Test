@@ -1,12 +1,31 @@
 resources:
+  - ns.yml
   - ../../base
-  - svc.yml
+
 replicas:
-  - name: nginx-deployment
+  - name: spec-deployment
     count: 1
 namespace: dev
 
 nameSuffix: -kustomize-dev
 
+labels:
+- includeSelectors: false
+  pairs:
+    env: dev
+
+
 patches:
-  - path: service-port.yml
+- target:
+    group: networking.k8s.io
+    version: v1
+    kind: Ingress
+    name: spec-ingress
+  path: patch-ingress.json
+
+- target:
+    group: networking.k8s.io
+    version: v1
+    kind: Ingress
+    name: spec-health-ingress
+  path: patch-health-ingress.json

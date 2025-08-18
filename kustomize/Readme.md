@@ -5,13 +5,14 @@
 helm create spec-app
 
 # generate yaml files form template 
-helm install spec -n test spec-app --dry-run > test.yaml 
+kubectl kustomize  overlays/prod  > test.yaml 
+kustomize build overlays/prod
 
 # install
-helm install spec -n test spec-app
+k apply -k overlays/prod
 
 # delete 
-helm delete spec -n test 
+k delete -k overlays/prod
 
 # update
 helm upgrade spec spec-app -n test
