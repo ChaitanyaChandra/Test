@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+resources:
+  - main.yml
+
+vars:
+  - name: SPEC_SERVICE
+    objref:
+      kind: Service
+      apiVersion: v1
+      name: spec-service

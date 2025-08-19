@@ -17,6 +17,7 @@ helm delete spec -n test
 helm upgrade spec -n test
 
 # history 
+helm list -n test
 helm history spec -n test
 
 

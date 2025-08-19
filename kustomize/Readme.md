@@ -10,17 +10,15 @@ kustomize build overlays/prod
 
 # install
 k apply -k overlays/prod
+kustomize build overlays/prod | k apply -f -
 
 # delete 
 k delete -k overlays/prod
-
+kustomize build overlays/prod | k delete -f -
 # update
-helm upgrade spec spec-app -n test
 
 # history 
-helm history spec -n test
 
 
 # rollback
-helm rollback spec -n test 5
 ```

@@ -2,12 +2,16 @@ resources:
   - ns.yml
   - ../../base
 
+components:
+  - ../../components/health_check
+
 replicas:
   - name: spec-deployment
     count: 1
 namespace: dev
 
 nameSuffix: -kustomize-dev
+namePrefix: v1-
 
 labels:
 - includeSelectors: false
@@ -21,7 +25,7 @@ patches:
     version: v1
     kind: Ingress
     name: spec-ingress
-  path: patch-ingress.json
+  path: patch-ingress.yml
 
 - target:
     group: networking.k8s.io

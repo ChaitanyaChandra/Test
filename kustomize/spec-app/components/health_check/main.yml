@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spec-health-check
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spec-health-check
+  template:
+    metadata:
+      labels:
+        app: spec-health-check
+    spec:
+      containers:
+        - name: curl-check
+          image: curlimages/curl:latest
+          args:
+            - /bin/sh
+            - -c
+            - |
+              while true; do
+                if curl -sf http://$(SPEC_SERVICE):9000/health; then
+                  echo "$(date) ✅ $(SPEC_SERVICE) service healthy"
+                else
+                  echo "$(date) ❌ $(SPEC_SERVICE) service unhealthy"
+                fi
+                sleep 120
+              done
