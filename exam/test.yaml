@@ -13,13 +13,19 @@ spec:
   containers:
   - name: mc-pod-1
     image: nginx:1-alpine
+    env:
+      - name: MY_NODE_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: spec.nodeName
   - name: mc-pod-2
     image: nginx:1-alpine
     command: ["sh", "-c"]
-    args: |-
-      while true; do
-        sleep 1;
-        echo $date >> /var/log/shared/date.log ;
+    args:
+    - while true;
+      do
+        sleep 1 ;
+        echo "$(date)" >> /var/log/shared/date.log ;
       done
     volumeMounts:
     - mountPath:  /var/log/shared/
@@ -27,10 +33,11 @@ spec:
   - name: mc-pod-3
     image: nginx:1-alpine
     command: ["sh", "-c"]
-    args: |-
-      while true; do
-        sleep 1;
-        cat /var/log/shared/date.log ;
+    args:
+    - while true ;
+      do
+        sleep 1 ;
+        cat /var/log/shared/date.log j;
       done
     volumeMounts:
     - mountPath:  /var/log/shared/
@@ -38,3 +45,4 @@ spec:
   volumes:
   - name: volume-one
     emptyDir: {}
+---
