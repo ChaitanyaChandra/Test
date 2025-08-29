@@ -12,7 +12,6 @@ type: kubernetes.io/service-account-token
 EOF
 
 
-# kubectl create token durgasri-sa -n dev --duration=8760h
 kubectl create clusterrole durgasri-cr --verb=get,list,watch --resource=pods,pods/status
 kubectl create clusterrolebinding durgasri-crb --clusterrole=durgasri-cr --serviceaccount=dev:durgasri-sa
 
@@ -35,4 +34,36 @@ users:
 - name: user1
   user:
     token: $(k get secrets -n dev  durgasri-sa-token -o json  | jq -r '.data.token' |  base64 -d)
+EOF
+
+TOKEN=$(k get secret -n dev durgasri-sa-token -o json | jq -r '.data.token' | base64 -d)
+echo $TOKEN | jwt decode -
+
+
+# using token API
+
+k create sa durgasri-sa -n dev
+
+TOKEN=$(k create token durgasri-sa -n dev --duration=8760h | base64 -d)
+echo $TOKEN | jwt decode -
+
+cat > "$HOME/.kube/chay/config" <<EOF
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: $(cat $HOME/.kube/ca/main.crt | base64 | tr -d '\n')
+    server: https://kubernetes.default.svc.svc.durgasri.in:16443/
+  name: kubernetes
+contexts:
+- context:
+    cluster: kubernetes
+    user: user1
+  name: user1@kubernetes
+current-context: user1@kubernetes
+kind: Config
+preferences: {}
+users:
+- name: user1
+  user:
+    token: $TOKEN
 EOF
