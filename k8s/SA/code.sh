@@ -20,7 +20,7 @@ cat > "$HOME/.kube/chay/config" <<EOF
 apiVersion: v1
 clusters:
 - cluster:
-    certificate-authority-data: $(cat $HOME/.kube/ca/main.crt | base64 | tr -d '\n') #$(k get secrets -n dev  durgasri-sa-token -o json  | jq -r '.data."ca.crt"')
+    certificate-authority-data: $(k get secrets -n dev  durgasri-sa-token -o json  | jq -r '.data."ca.crt"')
     server: https://kubernetes.default.svc.svc.durgasri.in:16443/
   name: kubernetes
 contexts:
