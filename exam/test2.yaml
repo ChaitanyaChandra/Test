@@ -1,0 +1,192 @@
+---
+# q1
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-sc
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: kubernetes.io/no-provisioner
+reclaimPolicy: Retain # default value is Delete
+allowVolumeExpansion: true
+mountOptions:
+  - discard # this might enable UNMAP / TRIM at the block storage layer
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  guaranteedReadWriteLatency: "true" # provider-specific
+---
+# q2
+# k create deploy logging-deployment -n logging-ns --replicas=1  --image=busybox --dry-run=client -o yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: logging-deployment
+  name: logging-deployment
+  namespace: logging-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logging-deployment
+  template:
+    metadata:
+      labels:
+        app: logging-deployment
+    spec:
+      containers:
+      - image: busybox
+        name: app-container
+        command:
+          - sh
+          - -c
+          - "while true; do echo 'Log entry' >> /var/log/app/app.log; sleep 5; done"
+        volumeMounts:
+        - mountPath: /var/log/app/
+          name: cache-volume
+      - image: busybox
+        name: log-agent
+        command:
+          - sh
+          - -c
+          - "tail -f /var/log/app/app.log"
+        volumeMounts:
+        - mountPath: /var/log/app/
+          name: cache-volume
+      volumes:
+      - name: cache-volume
+        emptyDir:
+          sizeLimit: 500Mi
+---
+# Q3
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: webapp-ingress
+  namespace: ingress-ns
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "kodekloud-ingress.app"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: webapp-svc
+            port:
+              number: 80
+---
+# Q4
+# k create deploy nginx-deploy --image=nginx:1.16 --replicas=1
+# kubectl set image deployments/nginx-deploy nginx=nginx:1.17
+---
+# Q5
+kubectl create role developer --resource=pods --verb=create,list,get,update,delete --namespace=development
+
+kubectl create rolebinding developer-role-binding --role=developer --user=john --namespace=development
+---
+# Q5 con..
+---
+apiVersion: certificates.k8s.io/v1
+kind: CertificateSigningRequest
+metadata:
+  name: john-developer
+spec:
+  signerName: kubernetes.io/kube-apiserver-client
+  request: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0KTUlJQ1ZEQ0NBVHdDQVFBd0R6RU5NQXNHQTFVRUF3d0VhbTlvYmpDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRApnZ0VQQURDQ0FRb0NnZ0VCQUt2Um1tQ0h2ZjBrTHNldlF3aWVKSzcrVVdRck04ZGtkdzkyYUJTdG1uUVNhMGFPCjV3c3cwbVZyNkNjcEJFRmVreHk5NUVydkgyTHhqQTNiSHVsTVVub2ZkUU9rbjYra1NNY2o3TzdWYlBld2k2OEIKa3JoM2prRFNuZGFvV1NPWXBKOFg1WUZ5c2ZvNUpxby82YU92czFGcEc3bm5SMG1JYWpySTlNVVFEdTVncGw4bgpjakY0TG4vQ3NEb3o3QXNadEgwcVpwc0dXYVpURTBKOWNrQmswZWhiV2tMeDJUK3pEYzlmaDVIMjZsSE4zbHM4CktiSlRuSnY3WDFsNndCeTN5WUFUSXRNclpUR28wZ2c1QS9uREZ4SXdHcXNlMTdLZDRaa1k3RDJIZ3R4UytkMEMKMTNBeHNVdzQyWVZ6ZzhkYXJzVGRMZzcxQ2NaanRxdS9YSmlyQmxVQ0F3RUFBYUFBTUEwR0NTcUdTSWIzRFFFQgpDd1VBQTRJQkFRQ1VKTnNMelBKczB2czlGTTVpUzJ0akMyaVYvdXptcmwxTGNUTStsbXpSODNsS09uL0NoMTZlClNLNHplRlFtbGF0c0hCOGZBU2ZhQnRaOUJ2UnVlMUZnbHk1b2VuTk5LaW9FMnc3TUx1a0oyODBWRWFxUjN2SSsKNzRiNnduNkhYclJsYVhaM25VMTFQVTlsT3RBSGxQeDNYVWpCVk5QaGhlUlBmR3p3TTRselZuQW5mNm96bEtxSgpvT3RORStlZ2FYWDdvc3BvZmdWZWVqc25Yd0RjZ05pSFFTbDgzSkljUCtjOVBHMDJtNyt0NmpJU3VoRllTVjZtCmlqblNucHBKZWhFUGxPMkFNcmJzU0VpaFB1N294Wm9iZDFtdWF4bWtVa0NoSzZLeGV0RjVEdWhRMi80NEMvSDIKOWk1bnpMMlRST3RndGRJZjAveUF5N05COHlOY3FPR0QKLS0tLS1FTkQgQ0VSVElGSUNBVEUgUkVRVUVTVC0tLS0tCg==
+  usages:
+  - digital signature
+  - key encipherment
+  - client auth
+---
+# Q6
+# k run nginx-resolver --image=nginx
+# k expose pod nginx-resolver --type=ClusterIP --port=80 --name nginx-resolver-service
+# k run debug-pod --image=busybox:1.28 -it -- sh
+# kubectl run test-nslookup --image=busybox:1.28 --rm -it --restart=Never -- nslookup nginx-resolver-service
+# kubectl run test-nslookup --image=busybox:1.28 --rm -it --restart=Never -- nslookup nginx-resolver-service > /root/CKA/nginx.svc
+# kubectl get pod nginx-resolver -o wide
+# kubectl run test-nslookup --image=busybox:1.28 --rm -it --restart=Never -- nslookup <P-O-D-I-P.default.pod> > /root/CKA/nginx.pod
+---
+# Q7
+# k run nginx-critical --image=nginx --dry-run=client -o yaml
+---
+# Q8
+# kubectl autoscale deployment backend-deployment --min=3 --max=15 --name=backend-hpa --dry-run=true -n backend -o yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: backend-hpa
+  namespace: backend
+spec:
+  maxReplicas: 15
+  minReplicas: 3
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: backend-deployment
+  metrics:
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 65
+---
+# Q9
+# web-gateway.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: web-gateway
+  namespace: cka5673
+spec:
+  gatewayClassName: kodekloud
+  listeners:
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: kodekloud.com
+      tls:
+        certificateRefs:
+          - name: kodekloud-tls
+---
+# Q11
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: test-network-policy
+  namespace: frontend
+spec:
+  podSelector:
+    matchLabels:
+      role: db
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - ipBlock:
+        cidr: 172.17.0.0/16
+        except:
+        - 172.17.1.0/24
+    - namespaceSelector:
+        matchLabels:
+          project: myproject
+    - podSelector:
+        matchLabels:
+          role: frontend
+    ports:
+    - protocol: TCP
+      port: 6379
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 10.0.0.0/24
+    ports:
+    - protocol: TCP
+      port: 5978
+

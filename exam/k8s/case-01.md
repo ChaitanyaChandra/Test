@@ -60,10 +60,34 @@ spec:
   - name: shared-logs
     emptyDir: {}
 ```
-
 ---
 
 > Q2
+
+* This question needs to be solved on node node01. 
+* To access the node using SSH:
+* As an administrator, you need to prepare node01 to install kubernetes. 
+* One of the steps is installing a container runtime. 
+* Install the `cri-docker_0.3.16.3-0.debian.deb` package located in /root and ensure that the cri-docker service is running and enabled to start on boot.
+
+> Acceptance
+
+* Is the package installed successfully on node01?
+* Is the service running?
+* Is the service enabled?
+
+> Solution
+
+```shell
+sudo apt install -y ./cri-docker_0.3.16.3-0.debian.deb
+sudo systemctl start cri-docker
+sudo systemctl enable cri-docker
+sudo systemctl status cri-docker
+```
+
+---
+
+> Q3
 
 * Create a service `messaging-service` to expose the messaging application within the cluster on port 6379.
 
@@ -85,7 +109,7 @@ kubectl expose pod messaging --port=6379 --name messaging-service
 
 ---
 
-> Q4
+> Q4 and Q5
 
 * Create a deployment named `hr-web-app` using the image kodekloud/webapp-color with 2 replicas.
 * Expose the `hr-web-app` as a service named `hr-web-app-service`, accessible on port `30082` on the nodes of the cluster.
@@ -114,7 +138,7 @@ kubectl expose deployment hr-web-app --type=NodePort --port=8080 --name=hr-web-a
 
 ---
 
-> Q5
+> Q6
 
 * create a Persistent Volume with the given specification: -
 * Volume name: pv-analytics
@@ -147,7 +171,7 @@ spec:
       path: /pv/data-analytics
 ```
 ---
-> Q6
+> Q7
 
 * Create a Horizontal Pod Autoscaler (HPA) with name `webapp-hpa`for the deployment named `kkapp-deploy` in the `default` namespace 
 * Ensure that the HPA scales the deployment based on CPU utilization, 
@@ -161,6 +185,8 @@ spec:
 * Is the HPA webapp-hpa deployed?
 * Is the deployment configured for metrics CPU Utilization?
 * Is the stabilization window set to 300 seconds?
+
+> Sol
 
 ```yaml
 apiVersion: autoscaling/v2
@@ -190,7 +216,7 @@ spec:
 
 ---
 
-> Q7
+> Q8
 
 * Deploy a Vertical Pod Autoscaler (VPA) with name `analytics-vpa` for the deployment named `analytics-deployment` in the `default` namespace.
 * The VPA should automatically adjust the CPU and memory requests of the pods to optimize resource utilization. 
@@ -223,7 +249,7 @@ spec:
 
 ---
 
-> Q8
+> Q9
 
 * create a Kubernetes Gateway resource with the following specifications:
   * Name: web-gateway
@@ -238,6 +264,8 @@ spec:
 
 * Is the web-gateway deployed to listen on port 80
 
+> Sol
+
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
@@ -250,5 +278,28 @@ spec:
     - name: http
       protocol: HTTP
       port: 80
+```
+---
+
+> Q10
+
+One co-worker deployed an nginx helm chart kk-mock1 in the kk-ns namespace on the cluster. 
+A new update is pushed to the helm chart, and the team wants you to update the helm repository to fetch the new changes.
+After updating the helm chart, upgrade the helm chart version to 18.1.15.
+
+> Acceptance  
+
+Is the deployment running?
+Is the chart version upgraded?
+
+> Sol
+
+```shell
+helm ls -A
+helm repo update kk-mock1 -n kk-ns
+helm search repo kk-mock1/nginx -n kk-ns -l | head -n30
+helm upgrade kk-mock1 kk-mock1/nginx -n kk-ns --version=18.1.15 
+helm ls -n kk-ns
+
 ```
 ---

@@ -14,7 +14,7 @@ spec:
   - name: mc-pod-1
     image: nginx:1-alpine
     env:
-      - name: MY_NODE_NAME
+      - name: NODE_NAME
         valueFrom:
           fieldRef:
             fieldPath: spec.nodeName
@@ -46,3 +46,21 @@ spec:
   - name: volume-one
     emptyDir: {}
 ---
+# k expose pod --port=6379 --name=messaging-service
+# k create deploy hr-web-app --image=kodekloud/webapp-color --replicas=2
+# k expose deployment  hr-web-app --port=30082 --target-port=8080 --name=hr-web-app-service
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-analytics
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+      path: /pv/data-analytics
+---
+kubectl autoscale deployment kkapp-deploy --cpu-percent=50 --min=1 --max=10
