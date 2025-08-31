@@ -1,0 +1,134 @@
+# Q1
+cat /etc/sysctl.conf # startup commands
+---
+# Q2
+# k create sa pvviewer
+# kubectl create clusterrole pvviewer-role --verb=list --resource=persistentvolumes
+# kubectl create clusterrolebinding pvviewer-role-binding --clusterrole=pvviewer-role --serviceaccount=default:pvviewer
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pvviewer
+spec:
+  containers:
+  - name: redis
+    image: redis
+  serviceAccountName: pvviewer
+---
+# Q3
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rancher-sc
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: rancher.io/local-path
+reclaimPolicy: Retain # default value is Delete
+allowVolumeExpansion: true
+mountOptions:
+  - discard # this might enable UNMAP / TRIM at the block storage layer
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  guaranteedReadWriteLatency: "true" # provider-specific
+---
+# Q4
+kubectl create configmap app-config -n cm-namespace --from-literal=ENV=production --from-literal=LOG_LEVEL=info
+kubectl set env deployment/cm-webapp -n cm-namespace --from=configmap/app-config
+---
+# Q5
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: low-priority
+value: 50000
+# priorityClassName
+---
+# Q6
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ingress-to-nptest
+spec:
+  podSelector:
+    matchLabels:
+      run: np-test-1
+  ingress:
+  - from:
+    ports:
+    - protocol: TCP
+      port: 80
+  policyTypes:
+  - Ingress
+---
+# q7
+# kubectl taint node node01 env_type=production:NoSchedule
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dev-redis
+spec:
+  containers:
+  - name: redis
+    image: redis:alpine
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: prod-redis
+spec:
+  containers:
+  - name: redis
+    image: redis:alpine
+  tolerations:
+    - key: "env_type"
+      operator: "Equal"
+      value: "production"
+      effect: "NoSchedule"
+---
+# Q8
+# ReadWriteOnce
+---
+# Q11
+# kubectl autoscale deployment api-deployment  --name=api-hpa  --min=1 --max=20 -n api
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api-hpa
+  namespace: api
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api-deployment
+  minReplicas: 1
+  maxReplicas: 20
+  metrics:
+  - type: Pods
+    pods:
+      metric:
+        name: requests_per_second
+      target:
+        type: AverageValue
+        averageValue: "1000"
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: web-route
+  namespace: default
+spec:
+  parentRefs:
+    - name: web-gateway
+      namespace: default
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: web-service
+          port: 80
+          weight: 80
+        - name: web-service-v2
+          port: 80
+          weight: 20
