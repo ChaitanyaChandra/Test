@@ -6,3 +6,6 @@ TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
 CACERT="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 curl --cacert ${CACERT} https://kubernetes.default/api/v1/pods -H "Authorization: Bearer ${TOKEN}"' > out.txt
 
+k auth can-i get po --as system:serviceaccount:default:debug-sa
+
+k config view --raw -o json | jq -r '.users[0].user["client-certificate-data"]' | base64 -d |openssl x509  --text -noout | grep Validity -a3
