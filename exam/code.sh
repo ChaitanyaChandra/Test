@@ -11,4 +11,3 @@ k auth can-i get po --as system:serviceaccount:default:debug-sa
 k config view --raw -o json | jq -r '.users[0].user["client-certificate-data"]' | base64 -d |openssl x509  --text -noout | grep Validity -a3
 
 k get po -A -o jsonpath="{range .items[*]} {.metadata.name} {.status.qosClass} {.spec.containers[*].resources} {'\n'}"
-
