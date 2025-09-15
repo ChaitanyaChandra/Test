@@ -1,0 +1,2 @@
+namespace,quota_name,cpu_requests,memory_requests,cpu_limits,memory_limits
+dev,dev-quota,2,4Gi,4,8Gi
