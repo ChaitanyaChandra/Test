@@ -56,4 +56,4 @@ with open(output_file, mode="w", newline="") as file:
                     tolerations_str
                 ])
 
-print(f"✅ Deployment resource details (only for 'dev' namespaces) saved to {output_file}")
+print(f"CSV saved to {output_file}")
