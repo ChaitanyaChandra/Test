@@ -14,7 +14,8 @@ with open(output_file, mode="w", newline="") as file:
     writer = csv.writer(file)
     writer.writerow([
         "Namespace", "Deployment", "Replicas", "Container",
-        "CPU Requests", "Memory Requests", "CPU Limits", "Memory Limits"
+        "CPU Requests", "Memory Requests", "CPU Limits", "Memory Limits",
+        "Tolerations"
     ])
 
     # Get all namespaces first
@@ -30,6 +31,16 @@ with open(output_file, mode="w", newline="") as file:
             name = dep.metadata.name
             replicas = dep.spec.replicas if dep.spec.replicas else 0
 
+            # Collect tolerations
+            tolerations = dep.spec.template.spec.tolerations or []
+            if tolerations:
+                tolerations_str = ",".join([
+                    f"{t.key}={t.value}" if t.value else t.key
+                    for t in tolerations if t.key
+                ])
+            else:
+                tolerations_str = "N/A"
+
             # Loop through containers in each deployment
             for container in dep.spec.template.spec.containers:
                 resources = container.resources
@@ -41,7 +52,8 @@ with open(output_file, mode="w", newline="") as file:
 
                 writer.writerow([
                     namespace, name, replicas, container.name,
-                    cpu_req, mem_req, cpu_lim, mem_lim
+                    cpu_req, mem_req, cpu_lim, mem_lim,
+                    tolerations_str
                 ])
 
 print(f"✅ Deployment resource details (only for 'dev' namespaces) saved to {output_file}")
