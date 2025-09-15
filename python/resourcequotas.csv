@@ -1,2 +1,2 @@
-namespace,quota_name,cpu_requests,memory_requests,cpu_limits,memory_limits
-dev,dev-quota,2,4Gi,4,8Gi
+namespace,quota_name,cpu_requests_hard,cpu_requests_used,memory_requests_hard,memory_requests_used,cpu_limits_hard,cpu_limits_used,memory_limits_hard,memory_limits_used
+dev,dev-quota,2,200m,4Gi,256Mi,4,1,8Gi,512Mi

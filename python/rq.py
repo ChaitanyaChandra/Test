@@ -10,7 +10,13 @@ v1 = client.CoreV1Api()
 output_file = "resourcequotas.csv"
 
 # CSV headers
-headers = ["namespace", "quota_name", "cpu_requests", "memory_requests", "cpu_limits", "memory_limits"]
+headers = [
+    "namespace", "quota_name",
+    "cpu_requests_hard", "cpu_requests_used",
+    "memory_requests_hard", "memory_requests_used",
+    "cpu_limits_hard", "cpu_limits_used",
+    "memory_limits_hard", "memory_limits_used"
+]
 
 with open(output_file, mode="w", newline="") as file:
     writer = csv.writer(file)
@@ -27,12 +33,14 @@ with open(output_file, mode="w", newline="") as file:
         for rq in rq_list:
             quota_name = rq.metadata.name
             hard = rq.status.hard or {}
+            used = rq.status.used or {}
 
-            cpu_requests = hard.get("requests.cpu", "N/A")
-            mem_requests = hard.get("requests.memory", "N/A")
-            cpu_limits = hard.get("limits.cpu", "N/A")
-            mem_limits = hard.get("limits.memory", "N/A")
+            writer.writerow([
+                ns, quota_name,
+                hard.get("requests.cpu", "N/A"), used.get("requests.cpu", "0"),
+                hard.get("requests.memory", "N/A"), used.get("requests.memory", "0"),
+                hard.get("limits.cpu", "N/A"), used.get("limits.cpu", "0"),
+                hard.get("limits.memory", "N/A"), used.get("limits.memory", "0")
+            ])
 
-            writer.writerow([ns, quota_name, cpu_requests, mem_requests, cpu_limits, mem_limits])
-
-print(f"ResourceQuota details saved to {output_file}")
+print(f"ResourceQuota details (hard & used) saved to {output_file}")
