@@ -1,4 +1,4 @@
 Namespace,Deployment,Replicas,Container,CPU Requests,Memory Requests,CPU Limits,Memory Limits,Tolerations
-dev,nginx-deployment,2,nginx,0,0,0,0,example-key=example-value
+dev,nginx-deployment,2,nginx,100m,128Mi,500m,256Mi,example-key=example-value
 dev,v1-spec-deployment-kustomize-dev,1,spec,0,0,0,0,N/A
 dev,v1-spec-health-check-kustomize-dev,1,curl-check,0,0,0,0,N/A
