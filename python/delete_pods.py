@@ -21,10 +21,9 @@ def cleanup_cluster(cluster_name):
     apps = client.AppsV1Api()
     core = client.CoreV1Api()
 
-
     # Scale old deployments
     for d in apps.list_namespaced_deployment(NAMESPACE).items:
-        age = now - d.metadata.creation_timestamp.replace(tzinfo=None)
+        age = now - d.metadata.creation_timestamp  # ✅ keep timezone-aware (no .replace)
         if age > timedelta(hours=THRESHOLD_HOURS):
             print(f"cluster_name: {cluster_name}, namespace: {NAMESPACE}, deployment: {d.metadata.name} → {age} old → scale to 0")
             apps.patch_namespaced_deployment_scale(
