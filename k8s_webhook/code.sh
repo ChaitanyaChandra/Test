@@ -52,12 +52,12 @@ kubectl create secret tls webhook-tls-secret \
 
 docker rmi $(docker images -a -q ) --force
 
-docker build -t docker.io/chaitanyachandra/webhook:arm_2.0  -t docker.io/chaitanyachandra/webhook:arm_latest .
-docker push docker.io/chaitanyachandra/webhook:arm_2.0
+docker build -t docker.io/chaitanyachandra/webhook:arm_3.0  -t docker.io/chaitanyachandra/webhook:arm_latest .
+docker push docker.io/chaitanyachandra/webhook:arm_3.0
 docker push docker.io/chaitanyachandra/webhook:arm_latest
 
 docker run -d \
-  -p 5555:443 \
+  -p 5555:8080 \
   -v ./CA/tls.crt:/mnt/certs/tls.crt:ro \
   -v ./CA/tls.key:/mnt/certs/tls.key:ro \
   --name webhook-app \
@@ -68,4 +68,4 @@ curl -k -X POST https://localhost:5555/mutate \
   --data @test-pod.json
 
 
-kubectl run webhook-pod --image=chaitanyachandra/webhook:arm_2.0 -it --rm -- /bin/sh
+kubectl run webhook-pod --image=chaitanyachandra/webhook:arm_3.0 -it --rm -- /bin/sh
