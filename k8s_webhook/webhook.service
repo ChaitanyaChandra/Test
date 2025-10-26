@@ -1,0 +1,19 @@
+[Unit]
+Description=Gunicorn for Kubernetes Webhook
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/root/Test/k8s_webhook
+Environment="PATH=/root/miniconda3/envs/jupyter/bin"
+ExecStart=/root/miniconda3/envs/jupyter/bin/gunicorn \
+    --certfile=CA/tls.crt \
+    --keyfile=CA/tls.key \
+    -b 0.0.0.0:5555 app.index:app
+Restart=always
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

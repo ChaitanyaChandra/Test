@@ -1,0 +1,17 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: platform-webhook
+webhooks:
+- name: platform.mutate.chaitu.net
+  clientConfig:
+    url: https://master.chaitu.net:5555/mutate
+    caBundle: <BASE64_ENCODED_CA_CERT>
+  rules:
+  - apiGroups: [""]
+    apiVersions: ["v1"]
+    operations: ["CREATE"]
+    resources: ["pods"]
+  admissionReviewVersions: ["v1"]
+  sideEffects: None
+  timeoutSeconds: 5
