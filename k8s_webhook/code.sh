@@ -52,8 +52,8 @@ kubectl create secret tls webhook-tls-secret \
 
 docker rmi $(docker images -a -q ) --force
 
-docker build -t docker.io/chaitanyachandra/webhook:arm_3.0  -t docker.io/chaitanyachandra/webhook:arm_latest .
-docker push docker.io/chaitanyachandra/webhook:arm_3.0
+docker build -t docker.io/chaitanyachandra/webhook:arm_1.0  -t docker.io/chaitanyachandra/webhook:arm_latest .
+docker push docker.io/chaitanyachandra/webhook:arm_1.0
 docker push docker.io/chaitanyachandra/webhook:arm_latest
 
 docker run -d \
