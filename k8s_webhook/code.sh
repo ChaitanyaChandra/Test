@@ -56,6 +56,16 @@ docker build -t docker.io/chaitanyachandra/webhook:arm_2.0  -t docker.io/chaitan
 docker push docker.io/chaitanyachandra/webhook:arm_2.0
 docker push docker.io/chaitanyachandra/webhook:arm_latest
 
+docker run -d \
+  -p 5555:443 \
+  -v tls.crt:/mnt/certs/tls.crt:ro \
+  -v tls.key:/mnt/certs/tls.key:ro \
+  --name webhook-app \
+  chaitanyachandra/webhook:arm_latest
+
+curl -k -X POST https://localhost:5555/mutate \
+  -H "Content-Type: application/json" \
+  --data @test-pod.json
 
 
 kubectl run webhook-pod --image=chaitanyachandra/webhook:arm_2.0 -it --rm -- /bin/sh
