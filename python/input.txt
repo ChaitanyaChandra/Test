@@ -1,0 +1,14 @@
+Semi-supervised Learning
+A hybrid form of unsupervised and supervised learning is also available in the
+form of semi-supervised learning, which is used for datasets that contain a mix
+of labeled and unlabeled cases. With the “more data the better” as a core
+motivator, the goal of semi- supervised learning is to leverage unlabeled cases to
+improve the reliability of the prediction model. One technique is to build the
+initial model using the labeled cases (supervised learning) and then use the same
+model to label the remaining cases (that are unlabeled) in the dataset. The model
+can then be retrained using a larger dataset (with less or no unlabeled cases).
+Alternatively, the model could be iteratively re-trained using newly labeled cases
+that meet a set threshold of confidence and adding the new cases to the training
+data after they meet the set threshold. There is, however, no guarantee that a
+semi-supervised model will outperform a model trained with less data (based
+exclusively on the original labeled cases).

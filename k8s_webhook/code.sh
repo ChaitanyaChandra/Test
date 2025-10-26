@@ -22,8 +22,8 @@ cat ca.crt | base64 | tr -d '\n' > ca_bundle.txt
 
 kubectl create secret tls webhook-tls-secret --cert=tls.crt --key=tls.key -n webhook
 
-docker build -t docker.io/chaitanyachandra/webhook:arm_1.0  -t docker.io/chaitanyachandra/webhook:arm_latest .
-docker push docker.io/chaitanyachandra/webhook:arm_1.0
+docker build -t docker.io/chaitanyachandra/webhook:arm_2.0  -t docker.io/chaitanyachandra/webhook:arm_latest .
+docker push docker.io/chaitanyachandra/webhook:arm_2.0
 docker push docker.io/chaitanyachandra/webhook:arm_latest
 
-kubectl run webhook-pod --image=chaitanyachandra/webhook:arm_1.0 -it --rm -- /bin/sh
+kubectl run webhook-pod --image=chaitanyachandra/webhook:arm_2.0 -it --rm -- /bin/sh

@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify
 import base64
 import json
+import logging
 
 app = Flask(__name__)
+logging.basicConfig(level=logging.INFO)
 
 # ------------------ MUTATING WEBHOOK ------------------ #
 @app.route('/mutate', methods=['POST'])
@@ -26,14 +28,18 @@ def mutate():
                 "value": "chaitanya"
             })
 
-    response = {
-        "response": {
-            "uid": request_info['request']['uid'],
-            "allowed": True,
-            "patchType": "JSONPatch" if patch else None,
-            "patch": base64.b64encode(json.dumps(patch).encode()).decode() if patch else None
-        }
+    response_obj = {
+        "uid": request_info['request']['uid'],
+        "allowed": True
     }
+
+    if patch:
+        response_obj.update({
+            "patchType": "JSONPatch",
+            "patch": base64.b64encode(json.dumps(patch).encode()).decode()
+        })
+
+    response = {"response": response_obj}
     return jsonify(response)
 
 # ------------------ VALIDATING WEBHOOK ------------------ #
@@ -58,5 +64,4 @@ def validate():
 
 # ------------------ ENTRY POINT ------------------ #
 if __name__ == '__main__':
-    # One server, two paths — runs with TLS
     app.run(host='0.0.0.0', port=443, ssl_context=('tls.crt', 'tls.key'))
