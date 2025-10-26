@@ -2,10 +2,11 @@ from flask import Flask, request, jsonify
 import base64
 import json
 import logging
+import os
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
-
+pwd = os.getcwd()
 
 # ------------------ MUTATING WEBHOOK ------------------ #
 @app.route('/mutate', methods=['POST'])
@@ -134,5 +135,4 @@ def health():
 
 # ------------------ ENTRY POINT ------------------ #
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080,
-            ssl_context=('/etc/webhook/certs/tls.crt', '/etc/webhook/certs/tls.key'))
+    app.run(host='0.0.0.0', port=8080, ssl_context=(f"{pwd}/CA/tls.crt", f"{pwd}/CA/tls.key"))
