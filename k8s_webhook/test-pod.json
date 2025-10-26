@@ -6,7 +6,7 @@
         "name": "test-pod",
         "namespace": "default",
         "labels": {
-          "platform_managed": "true"
+          "platform_managed": "True"
         }
       }
     }
