@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,18 +16,33 @@ spec:
     spec:
       containers:
       - name: webhook-app
-        imagePullPolicy: Always  # <--- Add this line to always pull the image
         image: chaitanyachandra/webhook:arm_latest
+        imagePullPolicy: Always
         ports:
-        - containerPort: 443
+          - containerPort: 443
         volumeMounts:
-        - name: webhook-certs
-          mountPath: "/mnt/certs/"
-          readOnly: true
+          - name: webhook-certs
+            mountPath: /mnt/certs
+            readOnly: true
+        # Optional — but recommended for webhooks:
+        readinessProbe:
+          httpGet:
+            path: /validate
+            port: 443
+            scheme: HTTPS
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /mutate
+            port: 443
+            scheme: HTTPS
+          initialDelaySeconds: 10
+          periodSeconds: 20
       volumes:
-      - name: webhook-certs
-        secret:
-          secretName: webhook-tls-secret
+        - name: webhook-certs
+          secret:
+            secretName: webhook-tls-secret
 ---
 apiVersion: v1
 kind: Service
@@ -34,8 +50,10 @@ metadata:
   name: webhook-service
   namespace: webhook
 spec:
-  ports:
-  - port: 443
-    targetPort: 443
   selector:
     app: webhook-app
+  ports:
+    - name: https
+      port: 443
+      targetPort: 443
+  type: ClusterIP
