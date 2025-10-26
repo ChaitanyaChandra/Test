@@ -63,9 +63,12 @@ docker run -d \
   --name webhook-app \
   chaitanyachandra/webhook:arm_latest
 
-curl -k -X POST https://localhost:5555/mutate \
+curl -k -X POST https://master.chaitu.net:5555/mutate \
   -H "Content-Type: application/json" \
   --data @test-pod.json
 
 
 kubectl run webhook-pod --image=chaitanyachandra/webhook:arm_3.0 -it --rm -- /bin/sh
+
+
+gunicorn --certfile=CA/tls.crt --keyfile=CA/tls.key -b 0.0.0.0:5555 app.index:app

@@ -5,7 +5,9 @@
       "metadata": {
         "name": "test-pod",
         "namespace": "default",
-        "labels": {}
+        "labels": {
+          "platform_managed": "true"
+        }
       }
     }
   }

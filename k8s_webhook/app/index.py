@@ -20,7 +20,7 @@ def mutate():
         patch = []
 
         # Only mutate if platform_managed=true
-        if labels.get('platform_managed') == 'true':
+        if str(labels.get('platform_managed')).lower() == 'true':
             if labels.get('owner') != 'chaitanya':
                 # Check if labels exist
                 if not labels:
@@ -83,7 +83,7 @@ def validate():
         labels = pod.get('metadata', {}).get('labels', {})
 
         # Only enforce validation if platform_managed=true
-        if labels.get('platform_managed') == 'true':
+        if str(labels.get('platform_managed')).lower() == 'true':
             allowed = 'maintainer' in labels
             status = {
                 "code": 200 if allowed else 403,
