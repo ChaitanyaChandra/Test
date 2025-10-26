@@ -58,8 +58,8 @@ docker push docker.io/chaitanyachandra/webhook:arm_latest
 
 docker run -d \
   -p 5555:443 \
-  -v CA/tls.crt:/mnt/certs/tls.crt:ro \
-  -v CA/tls.key:/mnt/certs/tls.key:ro \
+  -v ./CA/tls.crt:/mnt/certs/tls.crt:ro \
+  -v ./CA/tls.key:/mnt/certs/tls.key:ro \
   --name webhook-app \
   chaitanyachandra/webhook:arm_latest
 

@@ -64,4 +64,4 @@ def validate():
 
 # ------------------ ENTRY POINT ------------------ #
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=443, ssl_context=('tls.crt', 'tls.key'))
+    app.run(host='0.0.0.0', port=8080, ssl_context=('tls.crt', 'tls.key'))
