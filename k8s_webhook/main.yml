@@ -25,20 +25,16 @@ spec:
             mountPath: /mnt/certs
             readOnly: true
         # Optional — but recommended for webhooks:
-        readinessProbe:
-          httpGet:
-            path: /validate
-            port: 8080
-            scheme: HTTPS
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        livenessProbe:
-          httpGet:
-            path: /mutate
-            port: 8080
-            scheme: HTTPS
-          initialDelaySeconds: 10
-          periodSeconds: 20
+      readinessProbe:
+        tcpSocket:
+          port: 8080
+        initialDelaySeconds: 5
+        periodSeconds: 10
+      livenessProbe:
+        tcpSocket:
+          port: 8080
+        initialDelaySeconds: 10
+        periodSeconds: 20
       volumes:
         - name: webhook-certs
           secret:
