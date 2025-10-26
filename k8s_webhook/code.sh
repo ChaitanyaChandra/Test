@@ -1,10 +1,10 @@
 # Generate private key
 openssl genrsa -out webhook-server.key 2048
 
-# https://webhook-service.webhook.svc:443/mutate?timeout=5s
+# https://master.chaitu.net:5555/mutate?timeout=5s
 
 # Generate a CSR
-openssl req -new -key webhook-server.key -subj "/CN=webhook-service.webhook.svc" -out webhook-server.csr
+openssl req -new -key webhook-server.key -subj "/CN=master.chaitu.net" -out webhook-server.csr
 
 # Generate a self-signed CA
 openssl req -x509 -newkey rsa:4096 -sha256 -days 10000 -nodes \
@@ -20,15 +20,13 @@ distinguished_name = dn
 req_extensions = v3_req
 
 [ dn ]
-CN = webhook-service.webhook.svc
+CN = master.chaitu.net
 
 [ v3_req ]
 subjectAltName = @alt_names
 
 [ alt_names ]
-DNS.1 = webhook-service
-DNS.2 = webhook-service.webhook
-DNS.3 = webhook-service.webhook.svc
+DNS.1 = master.chaitu.net
 EOF
 
 # Sign the webhook server CSR with the CA
