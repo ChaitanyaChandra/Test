@@ -19,7 +19,7 @@ spec:
         image: chaitanyachandra/webhook:arm_latest
         imagePullPolicy: Always
         ports:
-          - containerPort: 443
+          - containerPort: 8080
         volumeMounts:
           - name: webhook-certs
             mountPath: /mnt/certs
@@ -28,14 +28,14 @@ spec:
         readinessProbe:
           httpGet:
             path: /validate
-            port: 443
+            port: 8080
             scheme: HTTPS
           initialDelaySeconds: 5
           periodSeconds: 10
         livenessProbe:
           httpGet:
             path: /mutate
-            port: 443
+            port: 8080
             scheme: HTTPS
           initialDelaySeconds: 10
           periodSeconds: 20
