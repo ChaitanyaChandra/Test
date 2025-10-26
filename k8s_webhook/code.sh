@@ -27,6 +27,9 @@ subjectAltName = @alt_names
 
 [ alt_names ]
 DNS.1 = master.chaitu.net
+DNS.2 = webhook-service
+DNS.3 = webhook-service.webhook
+DNS.4 = webhook-service.webhook.svc
 EOF
 
 # Sign the webhook server CSR with the CA
