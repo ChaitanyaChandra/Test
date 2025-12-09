@@ -1,0 +1,70 @@
+- name: run local
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    kubeconfig: ~/.kube/main
+    nodes:
+      - node1
+      - node2
+  tasks:
+    - name: create nodes group
+      add_host:
+        name: "{{ item }}.durgasri.in"
+        groups: nodes_group
+        ansible_user: root
+      loop: "{{ nodes }}"
+- name: run on nodes
+  hosts: nodes_group
+  gather_facts: false
+  tasks:
+    - name: run command
+      ansible.builtin.shell: "whoami && uptime"
+      register: result_one
+
+    - name: print result
+      ansible.builtin.debug:
+        var: result_one.stdout
+
+    - name: reboot the nodes
+      ansible.builtin.shell: "sleep 2 && shutdown -r now 'Rebooting for maintenance'"
+      async: 1
+      poll: 0
+      ignore_errors: true
+
+    - name: wait for node to come back
+      ansible.builtin.wait_for_connection:
+        connect_timeout: 5
+        sleep: 5
+        delay: 5
+        timeout: 900
+
+    - name: run command 2
+      ansible.builtin.shell: "whoami && uptime"
+      register: result_two
+
+    - name: print result 2
+      ansible.builtin.debug:
+        var: result_two.stdout
+
+    - name: wait for 3 minutes
+      ansible.builtin.pause:
+        seconds: 180
+
+- name: check nodes status
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    kubeconfig: ~/.kube/main/config
+    nodes:
+      - node1
+      - node2
+  tasks:
+    - name: include node status check
+      include_tasks: node.yaml
+      vars:
+        node: "{{ item }}"
+      loop: "{{ nodes }}"
+
+

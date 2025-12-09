@@ -1,0 +1,34 @@
+#- name: Wait until node is Ready (simple)
+#  kubernetes.core.k8s_info:
+#    kubeconfig: "{{ kubeconfig }}"
+#    kind: Node
+#    name: "{{ node }}"
+#  register: nodes_info
+#
+#- name: debut node_info
+#  debug:
+#    var: nodes_info
+
+- name: "Wait until {{ node }} is Ready"
+  kubernetes.core.k8s_info:
+    kubeconfig: "{{ kubeconfig }}"
+    kind: Node
+    name: "{{ node }}"
+  register: nodes_info
+  until: >
+    (nodes_info.resources[0].status.conditions
+    | selectattr('type', 'equalto', 'Ready')
+    | selectattr('status', 'equalto', 'True')
+    | list
+    | length) > 0
+  retries: 180
+  delay: 20
+
+
+#- name: debut node_info
+#  debug:
+#    var: nodes_info
+
+- name: Node is Ready
+  debug:
+    msg: "{{ node }} is Ready"
