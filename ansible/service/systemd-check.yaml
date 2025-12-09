@@ -1,0 +1,40 @@
+- name: run on localhost
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    kubeconfig: ~/.kube/main
+    nodes:
+      - node1
+      - node2
+  tasks:
+    - name: create nodes group
+      add_host:
+        name: "{{ item }}.durgasri.in"
+        groups: nodes_group
+        ansible_user: root
+      loop: "{{ nodes }}"
+- name: run on nodes
+  hosts: nodes_group
+  gather_facts: false
+  tasks:
+    - name: reboot the nodes
+      ansible.builtin.shell: "systemctl is-active systemd-resolved"
+      register: systemd_output
+      ignore_errors: true
+
+    - name: set fact
+      ansible.builtin.set_fact:
+        systemd_check_response: "systemd not in active state, current state: {{ systemd_output.stdout }}"
+#        cacheable: yes
+      when: systemd_output.stdout != "active"
+
+    - name: set fact
+      ansible.builtin.set_fact:
+        systemd_check_response: "insync"
+#        cacheable: yes
+      when: systemd_output.stdout == "active"
+
+    - name: Print
+      debug:
+        msg: "{{ systemd_check_response }}"
