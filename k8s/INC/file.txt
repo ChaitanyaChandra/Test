@@ -1,0 +1,6 @@
+
+# Tanzu Kubernetes Grid service (TKGs)
+https://interopmatrix.broadcom.com/Interoperability?col=680,&row=0,
+
+# vSphere Kubernetes releases (VKS)
+https://interopmatrix.broadcom.com/Interoperability?col=2234,&row=0,&isHidePatch=true&isHideLegacyReleases=false
