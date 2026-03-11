@@ -1,0 +1,180 @@
+
+---
+# ---------------------------------------------------------------
+# ConfigMap: FastAPI backend application code
+# Change this ConfigMap to update the backend logic without
+# rebuilding any image — just restart the pod.
+# ---------------------------------------------------------------
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-app-config
+  namespace: chaitanya-chandra-test
+data:
+  app.py: |
+    import asyncio
+    from fastapi import FastAPI, Request
+    from fastapi.responses import PlainTextResponse
+
+    app = FastAPI()
+
+    @app.get("/", response_class=PlainTextResponse)
+    async def root():
+        return "OK\n/proxy_read_timeout\n/proxy_send_timeout\n"
+
+    @app.get("/proxy_read_timeout", response_class=PlainTextResponse)
+    async def read_timeout():
+        await asyncio.sleep(30)
+        return "read_timeout: response sent (timeout did not fire)"
+
+    @app.post("/proxy_send_timeout", response_class=PlainTextResponse)
+    async def send_timeout(request: Request):
+        await asyncio.sleep(12)  # longer than 30s timeout
+        total = 0
+        async for chunk in request.stream():
+            total += len(chunk)
+        return f"send_timeout: received {total} bytes (timeout did not fire)"
+
+    @app.get("/health", response_class=PlainTextResponse)
+    async def health():
+        return "ok"
+
+
+---
+# ---------------------------------------------------------------
+# FastAPI Backend Pod (runs code from ConfigMap)
+# Uses init container to install deps so the main container can
+# run fully hardened (non-root, read-only FS, all caps dropped).
+# ---------------------------------------------------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: slow-backend-pod
+  namespace: chaitanya-chandra-test
+  labels:
+    app: slow-backend
+spec:
+  # ---- Init container: install pip packages into shared volume ----
+  initContainers:
+  - name: install-deps
+    image: python:3.11-slim
+    command: ["/bin/sh", "-c"]
+    args:
+    - pip install --target=/deps fastapi uvicorn --quiet
+    volumeMounts:
+    - name: deps
+      mountPath: /deps
+
+  # ---- Main container: hardened, runs app from ConfigMap ----
+  containers:
+  - name: backend
+    image: python:3.11-slim
+    ports:
+    - containerPort: 8000
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+    env:
+    - name: PYTHONPATH
+      value: /deps
+    command: ["/bin/sh", "-c"]
+    args:
+    - exec python -m uvicorn app:app --host 0.0.0.0 --port 8000 --app-dir /app
+    volumeMounts:
+    - name: app-code
+      mountPath: /app
+      readOnly: true
+    - name: deps
+      mountPath: /deps
+      readOnly: true
+    - name: tmp
+      mountPath: /tmp
+    readinessProbe:
+      httpGet:
+        path: /health
+        port: 8000
+      initialDelaySeconds: 10
+      periodSeconds: 5
+  volumes:
+  - name: app-code
+    configMap:
+      name: backend-app-config
+  - name: deps
+    emptyDir: {}
+  - name: tmp
+    emptyDir: {}
+
+---
+# ---------------------------------------------------------------
+# Service
+# ---------------------------------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: slow-backend-service
+  namespace: chaitanya-chandra-test
+spec:
+  selector:
+    app: slow-backend
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+
+---
+# ---------------------------------------------------------------
+# Ingress: all paths for timeout testing
+# ---------------------------------------------------------------
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: timeout-test-chaitanya-chandra-test
+  namespace: chaitanya-chandra-test
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "500m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "32"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: timeout-test.durgasri.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: slow-backend-service
+            port:
+              number: 8000
+      - path: /proxy_connect_timeout
+        pathType: Prefix
+        backend:
+          service:
+            name: slow-backend-service
+            port:
+              number: 8000
+      - path: /proxy_read_timeout
+        pathType: Prefix
+        backend:
+          service:
+            name: slow-backend-service
+            port:
+              number: 8000
+      - path: /proxy_send_timeout
+        pathType: Prefix
+        backend:
+          service:
+            name: slow-backend-service
+            port:
+              number: 8000
+
+#curl -X POST --data-binary @file.txt https://timeout-test.durgasri.com/proxy_send_timeout
+#curl https://timeout-test.durgasri.com/proxy_read_timeout
+#curl https://timeout-test.durgasri.com/
