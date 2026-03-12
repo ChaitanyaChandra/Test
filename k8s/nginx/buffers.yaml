@@ -1,0 +1,207 @@
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-app-config
+  namespace: chaitanya-chandra-test
+data:
+  app.py: |
+    import asyncio
+    from fastapi import FastAPI
+    from fastapi.responses import PlainTextResponse, StreamingResponse, Response
+
+    app = FastAPI()
+
+    # ------------------------------------------------------------------
+    # Health / root
+    # ------------------------------------------------------------------
+    @app.get("/", response_class=PlainTextResponse)
+    async def root():
+        return "OK"
+
+    @app.get("/health", response_class=PlainTextResponse)
+    async def health():
+        return "ok"
+
+    # ------------------------------------------------------------------
+    # Buffer-size test endpoints
+    # proxy-buffer-size:    64k  (65 536 bytes per buffer)
+    # proxy-buffers-number: 8    (pool = 8 × 64 KB = 512 KB)
+    # ------------------------------------------------------------------
+    KB = 1024
+    BUFFER_SIZE  = 64  * KB   # 65 536  — one nginx buffer
+    POOL_SIZE    = 8 * BUFFER_SIZE  # 524 288 — full pool
+
+    def _body(size: int) -> bytes:
+        """Return a repeating ASCII pattern of exactly `size` bytes."""
+        chunk = b"A" * 1024
+        out   = bytearray()
+        while len(out) < size:
+            out.extend(chunk)
+        return bytes(out[:size])
+
+    @app.get("/buffer/small")
+    async def buffer_small():
+        """~32 KB — fits in a single buffer."""
+        data = _body(32 * KB)
+        return Response(content=data, media_type="application/octet-stream")
+
+    @app.get("/buffer/exact64k")
+    async def buffer_exact64k():
+        """Exactly 64 KB — fills exactly one buffer."""
+        data = _body(BUFFER_SIZE)
+        return Response(content=data, media_type="application/octet-stream")
+
+    @app.get("/buffer/medium")
+    async def buffer_medium():
+        """~256 KB — fills four buffers (half the pool)."""
+        data = _body(256 * KB)
+        return Response(content=data, media_type="application/octet-stream")
+
+    @app.get("/buffer/large")
+    async def buffer_large():
+        """~512 KB — fills the entire buffer pool."""
+        data = _body(POOL_SIZE)
+        return Response(content=data, media_type="application/octet-stream")
+
+    @app.get("/buffer/oversized")
+    async def buffer_oversized():
+        """~1 MB — exceeds the pool; nginx must use a temp file or go chunked."""
+        data = _body(2 * POOL_SIZE)
+        return Response(content=data, media_type="application/octet-stream")
+
+    @app.get("/buffer/slow")
+    async def buffer_slow():
+        """
+        Streams ~256 KB at 1 KB per 50 ms (~13 s total).
+        With proxy-buffering ON nginx absorbs the data into its pool and
+        serves the client without waiting for the upstream to finish.
+        """
+        total  = 256 * KB
+        chunk  = 1   * KB
+
+        async def generator():
+            sent = 0
+            while sent < total:
+                yield b"B" * min(chunk, total - sent)
+                sent += chunk
+                await asyncio.sleep(0.05)
+
+        return StreamingResponse(generator(), media_type="application/octet-stream",
+                                 headers={"X-Accel-Buffering": "yes"})
+
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: slow-backend-pod
+  namespace: chaitanya-chandra-test
+  labels:
+    app: slow-backend
+spec:
+  initContainers:
+  - name: install-deps
+    image: python:3.11-slim
+    command: ["/bin/sh", "-c"]
+    args:
+    - pip install --target=/deps fastapi uvicorn python-multipart --quiet
+    volumeMounts:
+    - name: deps
+      mountPath: /deps
+  containers:
+  - name: backend
+    image: python:3.11-slim
+    ports:
+    - containerPort: 8000
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+    env:
+    - name: PYTHONPATH
+      value: /deps
+    command: ["/bin/sh", "-c"]
+    args:
+    - exec python -m uvicorn app:app --host 0.0.0.0 --port 8000 --app-dir /app
+    volumeMounts:
+    - name: app-code
+      mountPath: /app
+      readOnly: true
+    - name: deps
+      mountPath: /deps
+      readOnly: true
+    - name: tmp
+      mountPath: /tmp
+    readinessProbe:
+      httpGet:
+        path: /health
+        port: 8000
+      initialDelaySeconds: 10
+      periodSeconds: 5
+  volumes:
+  - name: app-code
+    configMap:
+      name: backend-app-config
+  - name: deps
+    emptyDir: {}
+  - name: tmp
+    emptyDir: {}
+
+---
+# ---------------------------------------------------------------
+# Service
+# ---------------------------------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: chaitanya-chandra-test
+spec:
+  selector:
+    app: slow-backend
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: test-ingress
+  namespace: chaitanya-chandra-test
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-buffering: "on"
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "8"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "64k"
+    nginx.ingress.kubernetes.io/proxy-body-size: "500m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "32"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "30"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: test.durgasri.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 8000
+      - path: /proxy_connect_timeout
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 8000
+
