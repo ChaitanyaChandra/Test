@@ -28,7 +28,7 @@ async def validate_rewrite_webhook(request: Request):
     rewrite_annotation = body['request']['object']['metadata']['annotations'].get('nginx.ingress.kubernetes.io/rewrite-target', '')
     if rewrite_annotation and re.search(r'\$\d+', rewrite_annotation):
         json_res['response']['allowed'] = False
-        json_res['response']['warnings'].append("Rewrite annotation must not contain numeric capture groups like $1, $2, etc.")
+        json_res['response']['warnings'].append(f"'nginx.ingress.kubernetes.io/rewrite-target: {rewrite_annotation}' must not contain values like $1, $2, etc.")
 
     return json_res
 
