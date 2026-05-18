@@ -1,0 +1,10 @@
+uvicorn
+fastapi
+kubernetes
+pytest
+pytest-cov
+pylint
+pytest-xdist
+httpx
+certifi
+starlette

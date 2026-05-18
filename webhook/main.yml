@@ -1,0 +1,55 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webhook-app-deploy
+  namespace: webhook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webhook-app
+  template:
+    metadata:
+      labels:
+        app: webhook-app
+    spec:
+      containers:
+      - name: webhook-app
+        image: chaitanyachandra/webhook:arm_latest
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8080
+        volumeMounts:
+          - name: webhook-certs
+            mountPath: /mnt/certs
+            readOnly: true
+        # Optional — but recommended for webhooks:
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 20
+      volumes:
+        - name: webhook-certs
+          secret:
+            secretName: webhook-tls-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webhook-service
+  namespace: webhook
+spec:
+  selector:
+    app: webhook-app
+  ports:
+    - name: https
+      port: 443
+      targetPort: 8080
+  type: ClusterIP

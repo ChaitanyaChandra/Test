@@ -1,0 +1,53 @@
+{
+  "request": {
+    "uid": "67890",
+    "object": {
+      "apiVersion": "networking.k8s.io/v1",
+      "kind": "Ingress",
+      "metadata": {
+        "name": "test-ingress",
+        "namespace": "default",
+        "labels": {
+          "platform_managed": true,
+          "app": "test-app"
+        },
+        "annotations": {
+          "kubernetes.io/ingress.class": "nginx",
+          "nginx.ingress.kubernetes.io/rewrite-target": "/name$1"
+        }
+      },
+      "spec": {
+        "ingressClassName": "nginx",
+        "rules": [
+          {
+            "host": "example.com",
+            "http": {
+              "paths": [
+                {
+                  "path": "/",
+                  "pathType": "Prefix",
+                  "backend": {
+                    "service": {
+                      "name": "example-service",
+                      "port": {
+                        "number": 80
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "tls": [
+          {
+            "hosts": [
+              "example.com"
+            ],
+            "secretName": "example-tls"
+          }
+        ]
+      }
+    }
+  }
+}
