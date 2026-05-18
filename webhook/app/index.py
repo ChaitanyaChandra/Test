@@ -4,7 +4,7 @@ from routers import validate_rewrite
 import logging
 
 
-if os.getenv("DEBUG", "false").lower() == "true":
+if os.getenv("DEBUG", "false").lower()  == "true":
     logging.root.setLevel(logging.DEBUG)
 
 app = FastAPI()

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request
 import logging
+import re
 from routers.defaults import default_response, output_response
 
 router = APIRouter(
@@ -20,14 +21,14 @@ async def validate_rewrite_webhook(request: Request):
     if body['request']['object']['spec']['ingressClassName'] != "nginx":
         return output_response(json_res)
 
-    # fail the validation webhook if the rewrite annotation contains $1,$2,$3...
+    # fail the validation webhook if the rewrite annotation contains any numeric capture group placeholder like $1, $11, $1000
     if 'annotations' not in body['request']['object']['metadata']:
         return output_response(json_res)
 
     rewrite_annotation = body['request']['object']['metadata']['annotations'].get('nginx.ingress.kubernetes.io/rewrite-target', '')
-    if rewrite_annotation and any(f"${i}" in rewrite_annotation for i in range(1, 10)):
+    if rewrite_annotation and re.search(r'\$\d+', rewrite_annotation):
         json_res['response']['allowed'] = False
-        json_res['response']['warnings'].append("Rewrite annotation does not contain capture groups ($1, $2, etc.). ")
+        json_res['response']['warnings'].append("Rewrite annotation must not contain numeric capture groups like $1, $2, etc.")
 
     return json_res
 
