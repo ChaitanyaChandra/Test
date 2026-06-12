@@ -6,6 +6,6 @@ summary+=$'\n| Item | Data | Status |'
 summary+=$'\n|-----|------|--------|'
 
 time=$(date '+%Y-%m-%d %H:%M:%S')
-summary+="\n| Timestamp | '$time' | Success |"
+summary+=$'\n'"| Timestamp | '$time' | Success |"
 
-echo -e "$summary" >> $GITHUB_STEP_SUMMARY
+printf '%s\n' "$summary" >> "$GITHUB_STEP_SUMMARY"

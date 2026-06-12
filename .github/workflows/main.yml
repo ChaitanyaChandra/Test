@@ -30,7 +30,7 @@ jobs:
           echo "hostname=$HN" >> "$GITHUB_OUTPUT"
 
           {
-            echo -e "\n| Hostname | '$HN' | Success |"
+            echo "| Hostname | '$HN' | Success |"
           } >> "$GITHUB_STEP_SUMMARY"
 
           echo "✅ Hostname row appended: $HN"
