@@ -29,8 +29,7 @@ jobs:
           HN=$(hostname)
           echo "hostname=$HN" >> "$GITHUB_OUTPUT"
 
-          {
-            echo "| Hostname | '$HN' | Success |"
-          } >> "$GITHUB_STEP_SUMMARY"
+          # Append directly to step 1's summary file so the row lands inside the same table
+          echo "| Hostname | '$HN' | Success |" >> "${{ steps.execute_tests.outputs.summary_file }}"
 
           echo "✅ Hostname row appended: $HN"
