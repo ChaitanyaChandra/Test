@@ -1,17 +1,13 @@
 #!/bin/bash
 
+# Both TIMESTAMP and HOSTNAME are injected as env variables from workflow steps
+
 summary=$'# STATUS'
-summary+=$'\n| Item | Data | Status |'
-summary+=$'\n|-----|------|--------|'
+summary+=$'\n| Item      | Data                    | Status  |'
+summary+=$'\n|-----------|-------------------------|---------|'
+summary+=$'\n'"| Timestamp | '$TIMESTAMP'            | Success |"
+summary+=$'\n'"| Hostname  | '$HN'                   | Success |"
 
-time=$(date '+%Y-%m-%d %H:%M:%S')
-hn=$(hostname)
+printf '%s\n' "$summary" >> "$GITHUB_STEP_SUMMARY"
 
-summary+=$'\n'"| Timestamp | '$time' | Success |"
-summary+=$'\n'"| Hostname | '$hn' | Success |"
-
-
-echo -e "$summary" >> "$GITHUB_STEP_SUMMARY"
-
-# Expose this step's summary file path so other steps can append to it
-echo "summary_file=$GITHUB_STEP_SUMMARY" >> "$GITHUB_OUTPUT"
+echo "✅ Summary written — Timestamp=$TIMESTAMP  Hostname=$HN"

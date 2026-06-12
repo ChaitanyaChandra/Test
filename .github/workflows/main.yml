@@ -12,12 +12,35 @@ jobs:
       timestamp: ${{ steps.ts.outputs.timestamp }}
 
     steps:
+      - name: Get Timestamp
+        id: ts
+        run: |
+          TS=$(date '+%Y-%m-%d %H:%M:%S')
+          echo "timestamp=$TS" >> "$GITHUB_OUTPUT"
+          echo "✅ Timestamp captured: $TS"
+
+  get-hostname:
+    name: "📋 [2/2] Hostname + Summary"
+    runs-on: ubuntu-latest
+    needs: [get-timestamp]
+
+    steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: execute tests
+      - name: Get Hostname
+        id: hn
+        run: |
+          HN=$(hostname)
+          echo "HN=$HN" >> "$GITHUB_OUTPUT"
+          echo "✅ Hostname captured: $HN"
+
+      - name: Build Summary Table
         id: execute_tests
         shell: bash
+        env:
+          TIMESTAMP: ${{ needs.get-timestamp.outputs.timestamp }}
+          HN: ${{ steps.hn.outputs.HN }}
         run: |
           chmod +x ./shell/gh/code.sh
           bash ./shell/gh/code.sh
