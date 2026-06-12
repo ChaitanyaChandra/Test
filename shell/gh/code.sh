@@ -5,7 +5,11 @@ summary+=$'\n| Item | Data | Status |'
 summary+=$'\n|-----|------|--------|'
 
 time=$(date '+%Y-%m-%d %H:%M:%S')
+hn=$(hostname)
+
 summary+=$'\n'"| Timestamp | '$time' | Success |"
+summary+=$'\n'"| Hostname | '$hn' | Success |"
+
 
 echo -e "$summary" >> "$GITHUB_STEP_SUMMARY"
 

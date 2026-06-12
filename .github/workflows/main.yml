@@ -21,15 +21,3 @@ jobs:
         run: |
           chmod +x ./shell/gh/code.sh
           bash ./shell/gh/code.sh
-        
-
-      - name: Capture & append hostname row
-        id: hn
-        run: |
-          HN=$(hostname)
-          echo "hostname=$HN" >> "$GITHUB_OUTPUT"
-
-          # Append directly to step 1's summary file so the row lands inside the same table
-          echo "| Hostname | '$HN' | Success |" >> "${{ steps.execute_tests.outputs.summary_file }}"
-
-          echo "✅ Hostname row appended: $HN"
