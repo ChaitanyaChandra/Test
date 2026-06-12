@@ -1,55 +1,43 @@
-name: Persist Environment Variable
+name: System Info Summary
 
 on:
   workflow_dispatch:
 
+  
 jobs:
-  save-variable:
+  get-timestamp:
+    name: "📋 [1/2] Timestamp"
     runs-on: ubuntu-latest
+    outputs:
+      timestamp: ${{ steps.ts.outputs.timestamp }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Download artifact if present
-        id: download-artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: vars_test1
-          path: vars.txt
-          if-no-files-found: ignore
-
-      - name: Check if artifact exists
+      - name: execute tests
+        id: execute_tests
+        shell: bash
         run: |
-          ls
-          if [ -f vars.txt ]; then
-            echo "Artifact found and downloaded."
-            echo "artifacts_exists=true" >> $GITHUB_ENV
-          else
-            echo "Artifact does not exist"
-            echo "artifacts_exists=false" >> $GITHUB_ENV
-          fi
+          ./shell/gh/code.sh
+    
 
-      - name: Save a variable to a file
-        if: env.artifacts_exists == 'false'  # Only run if the artifact does not exist
-        run: |
-          current_date=$(date)
-          echo "snap_date='$current_date'" > vars.txt
-
-      - name: Upload the variable as an artifact
-        if: env.artifacts_exists == 'false'  # Only run if the artifact does not exist
-        uses: actions/upload-artifact@v3
-        with:
-          name: vars_test1
-          path: vars.txt
-
-  load-variable:
+  get-hostname:
+    name: "📋 [2/2] Hostname"
     runs-on: ubuntu-latest
-    needs: save-variable
-    steps:
+    needs: [get-timestamp]
+    outputs:
+      hostname: ${{ steps.hn.outputs.hostname }}
 
-      - name: Load the variable from the file
+    steps:
+      - name: Capture & append hostname row
+        id: hn
         run: |
-          source vars.txt
-          echo `date`
-          echo "Loaded variable: $snap_date"
+          HN=$(hostname)
+          echo "hostname=$HN" >> "$GITHUB_OUTPUT"
+
+          {
+            echo -e "\n| Hostname | '$HN' | Success |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "✅ Hostname row appended: $HN"
