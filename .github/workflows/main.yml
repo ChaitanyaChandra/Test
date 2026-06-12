@@ -21,16 +21,8 @@ jobs:
         run: |
           chmod +x ./shell/gh/code.sh
           bash ./shell/gh/code.sh
-    
+        
 
-  get-hostname:
-    name: "📋 [2/2] Hostname"
-    runs-on: ubuntu-latest
-    needs: [get-timestamp]
-    outputs:
-      hostname: ${{ steps.hn.outputs.hostname }}
-
-    steps:
       - name: Capture & append hostname row
         id: hn
         run: |
