@@ -19,7 +19,8 @@ jobs:
         id: execute_tests
         shell: bash
         run: |
-          ./shell/gh/code.sh
+          chmod +x ./shell/gh/code.sh
+          bash ./shell/gh/code.sh
     
 
   get-hostname:
