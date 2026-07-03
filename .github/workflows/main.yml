@@ -35,16 +35,6 @@ jobs:
           echo "HN=$HN" >> "$GITHUB_OUTPUT"
           echo "✅ Hostname captured: $HN"
 
-      - name: Build Summary Table
-        id: execute_tests
-        shell: bash
-        env:
-          TIMESTAMP: ${{ needs.get-timestamp.outputs.timestamp }}
-          HN: ${{ steps.hn.outputs.HN }}
-        run: |
-          chmod +x ./shell/gh/code.sh
-          bash ./shell/gh/code.sh
-
   get-resource-summary:
     name: "📋 [3/3] Resource Summary"
     runs-on: ubuntu-latest
@@ -68,5 +58,7 @@ jobs:
           TIMESTAMP: ${{ needs.get-timestamp.outputs.timestamp }}
           HN: ${{ steps.hn.outputs.HN }}
         run: |
-          chmod +x ./shell/gh/code2.sh
-          bash ./shell/gh/code2.sh
+          chmod +x ./shell/gh/code.sh
+          for table in RESOURCE STATUS; do
+            ./shell/gh/code.sh "$table"
+          done
