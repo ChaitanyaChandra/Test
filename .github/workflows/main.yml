@@ -6,7 +6,7 @@ on:
   
 jobs:
   get-timestamp:
-    name: "📋 [1/2] Timestamp"
+    name: "📋 [1/3] Timestamp"
     runs-on: ubuntu-latest
     outputs:
       timestamp: ${{ steps.ts.outputs.timestamp }}
@@ -20,7 +20,7 @@ jobs:
           echo "✅ Timestamp captured: $TS"
 
   get-hostname:
-    name: "📋 [2/2] Hostname + Summary"
+    name: "📋 [2/3] Hostname + Summary"
     runs-on: ubuntu-latest
     needs: [get-timestamp]
 
@@ -44,3 +44,29 @@ jobs:
         run: |
           chmod +x ./shell/gh/code.sh
           bash ./shell/gh/code.sh
+
+  get-resource-summary:
+    name: "📋 [3/3] Resource Summary"
+    runs-on: ubuntu-latest
+    needs: [get-timestamp]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get Hostname
+        id: hn
+        run: |
+          HN=$(hostname)
+          echo "HN=$HN" >> "$GITHUB_OUTPUT"
+          echo "✅ Hostname captured: $HN"
+
+      - name: Build Resource Summary Table
+        id: execute_resource_summary
+        shell: bash
+        env:
+          TIMESTAMP: ${{ needs.get-timestamp.outputs.timestamp }}
+          HN: ${{ steps.hn.outputs.HN }}
+        run: |
+          chmod +x ./shell/gh/code2.sh
+          bash ./shell/gh/code2.sh
