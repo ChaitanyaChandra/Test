@@ -34,7 +34,6 @@ for item in "${rows[@]}"; do
   val="${item#*:}"
   summary+=$'\n'"| $name | $val | Success |"
 done
-
 printf '%s\n\n' "$summary" >> "$GITHUB_STEP_SUMMARY"
 
 echo "✅ $title summary written"

@@ -5,6 +5,29 @@ on:
 
   
 jobs:
+
+  check-env:
+    environment:
+      name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Timestamp
+        env: 
+          S1_data = ${{ secrets.S1 }}
+          S2_data = ${{ secrets.S2 }}
+        id: ts
+        run: |
+          if [ -z "$S1_data" ]; then
+            echo "S1 key not found in secrets"
+            exit 1
+          fi
+          if [ -z "$S2_data" ]; then
+            echo "S2 key not found in secrets"
+            exit 1
+          fi
+          echo "S1_data: $S1_data"
+          echo "S2_data: $S2_data"
+
   get-timestamp:
     name: "📋 [1/3] Timestamp"
     runs-on: ubuntu-latest
