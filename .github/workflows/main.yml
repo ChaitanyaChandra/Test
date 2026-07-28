@@ -20,6 +20,7 @@ jobs:
         run: |
           echo "timestamp=$(date)" >> "$GITHUB_OUTPUT"
           echo "hostname=$(hostname)" >> "$GITHUB_OUTPUT"
+          echo "data=$(curl https://app.durgasri.com/env -s  | jq)" >> "$GITHUB_OUTPUT"
 
   copy-files-jump1:
     runs-on: ubuntu-latest
@@ -42,9 +43,10 @@ jobs:
           FILES_DIR=$(mktemp -d)
           echo "$timestamp_content" > "$FILES_DIR/timestamp.txt"
           echo "$hostname_content" > "$FILES_DIR/hostname.txt"
+          echo "${{ needs.generate_files.outputs.data }}" > "$FILES_DIR/data.json"
           
           # Setup SSH key
-          mkdir -p ~/.ssh
+          mkdir -p ~/.ssh 
           echo "$jump1_ssh" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           
@@ -75,10 +77,11 @@ jobs:
           FILES_DIR=$(mktemp -d)
           echo "$timestamp_content" > "$FILES_DIR/timestamp.txt"
           echo "$hostname_content" > "$FILES_DIR/hostname.txt"
-          
+          echo "${{ needs.generate_files.outputs.data }}" > "$FILES_DIR/data.json"
+
           # Setup SSH key
           mkdir -p ~/.ssh
-          echo "$jump2ssh" > ~/.ssh/id_rsa
+          echo "$jump2_ssh" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           
           # Copy files via scp
