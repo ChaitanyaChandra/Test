@@ -78,7 +78,7 @@ jobs:
           
           # Setup SSH key
           mkdir -p ~/.ssh
-          echo "$jump1_ssh" > ~/.ssh/id_rsa
+          echo "$jump2ssh" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           
           # Copy files via scp
