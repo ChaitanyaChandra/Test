@@ -60,7 +60,7 @@ jobs:
     steps:
       - name: copy files to jump2
         env: 
-          jump2_ssh: ${{ secrets.JUMP2 }}
+          jump2_ssh: ${{ secrets.JUMP1 }}
           host: ${{ vars.HOST2 }}
           timestamp_content: ${{ needs.generate_files.outputs.timestamp }}
           hostname_content: ${{ needs.generate_files.outputs.hostname }}
