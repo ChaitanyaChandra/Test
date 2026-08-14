@@ -2,6 +2,7 @@ import logging
 import json
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
+import base64
 
 def default_response(uid: str):
     return {
@@ -21,3 +22,11 @@ def output_response(response: dict):
     if len(response['response']['warnings']) > 0:
         response['response']['status'] = {"message": ','.join(response['response']['warnings'])}
     return JSONResponse(content=jsonable_encoder(response)) 
+
+def apply_patchset_to_response(response, patchset, warnings = []):
+
+    if len(patchset) > 0:
+        response['response']['patchType'] = "JSONPatch"
+        response['response']['patch'] = base64.b64encode(json.dumps(patchset).encode('utf-8')).decode('utf-8')
+        response['response']['warnings'] = warnings
+    return response
