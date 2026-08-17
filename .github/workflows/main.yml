@@ -21,7 +21,8 @@ jobs:
         run: |
           echo "timestamp=$(date)" >> "$GITHUB_OUTPUT"
           echo "hostname=$(hostname)" >> "$GITHUB_OUTPUT"
-          echo "data=$(curl https://app.durgasri.com/env -s | base64 -w 0)" >> "$GITHUB_OUTPUT"
+          curl https://app.durgasri.com/env -s > conf.txt
+          echo "data=$(cat conf.txt | base64 -w 0)" >> "$GITHUB_OUTPUT"
 
   copy-files-jump1:
     runs-on: ubuntu-latest
