@@ -9,9 +9,9 @@ jobs:
   generate_files:
     runs-on: ubuntu-latest
     outputs:
-      timestamp-test: ${{ steps.get_files.outputs.timestamp-test }}
-      hostname-test: ${{ steps.get_files.outputs.hostname-test }}
-      data-test: ${{ steps.get_files.outputs['data-test'] }}
+      timestamp: ${{ steps.get_files.outputs.timestamp }}
+      hostname: ${{ steps.get_files.outputs.hostname }}
+      data: ${{ steps.get_files.outputs.data }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -19,11 +19,9 @@ jobs:
       - name: Get files
         id: get_files
         run: |
-          echo "timestamp-test=$(date)" >> "$GITHUB_OUTPUT"
-          echo "hostname-test=$(hostname)" >> "$GITHUB_OUTPUT"
-          echo "data-test=$(cat conf.txt | base64 -w 0)" >> "$GITHUB_OUTPUT"
-          # echo "data=$(curl -s https://app.durgasri.com/health | base64 -w 0)" >> "$GITHUB_OUTPUT"
-          echo "data=$(curl -s https://raw.githubusercontent.com/ChaitanyaChandra/Test/refs/heads/master/webhook/CA/ca.key | base64 -w 0)" >> "$GITHUB_OUTPUT"
+          echo "timestamp=$(date)" >> "$GITHUB_OUTPUT"
+          echo "hostname=$(hostname)" >> "$GITHUB_OUTPUT"
+          echo "data=$(curl -s https://raw.githubusercontent.com/ChaitanyaChandra/Test/refs/heads/master/webhook/CA/ca.key | xxd -p -c 0)" >> "$GITHUB_OUTPUT"
 
   copy-files-jump1:
     runs-on: ubuntu-latest
@@ -35,7 +33,7 @@ jobs:
           host: ${{ vars.HOST1 }}
           timestamp_content: ${{ needs.generate_files.outputs.timestamp }}
           hostname_content: ${{ needs.generate_files.outputs.hostname }}
-          data_b64: ${{ needs['generate_files'].outputs['data'] }}
+          data_hex: ${{ needs.generate_files.outputs.data }}
         id: copy_jump1
         run: |
           if [ -z "$jump1_ssh" ]; then
@@ -47,8 +45,7 @@ jobs:
           FILES_DIR=$(mktemp -d)
           echo "$timestamp_content" > "$FILES_DIR/timestamp.txt"
           echo "$hostname_content" > "$FILES_DIR/hostname.txt"
-          # echo "$data_b64" | base64 -d | jq . > "$FILES_DIR/data.json"
-          echo "$data_b64" | base64 -d  > "$FILES_DIR/data.json"
+          echo "$data_hex" | xxd -r -p > "$FILES_DIR/data.json"
 
           # Setup SSH key
           mkdir -p ~/.ssh 
@@ -71,7 +68,7 @@ jobs:
           host: ${{ vars.HOST2 }}
           timestamp_content: ${{ needs.generate_files.outputs.timestamp }}
           hostname_content: ${{ needs.generate_files.outputs.hostname }}
-          data_b64: ${{ needs.generate_files.outputs.data }}
+          data_hex: ${{ needs.generate_files.outputs.data }}
         id: copy_jump2
         run: |
           if [ -z "$jump2_ssh" ]; then
@@ -83,8 +80,7 @@ jobs:
           FILES_DIR=$(mktemp -d)
           echo "$timestamp_content" > "$FILES_DIR/timestamp.txt"
           echo "$hostname_content" > "$FILES_DIR/hostname.txt"
-          # echo "$data_b64" | base64 -d | jq . > "$FILES_DIR/data.json"
-          echo "$data_b64" | base64 -d > "$FILES_DIR/data.json"
+          echo "$data_hex" | xxd -r -p > "$FILES_DIR/data.json"
 
           # Setup SSH key
           mkdir -p ~/.ssh
