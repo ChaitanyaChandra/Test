@@ -21,7 +21,7 @@ jobs:
         run: |
           echo "timestamp-test=$(date)" >> "$GITHUB_OUTPUT"
           echo "hostname-test=$(hostname)" >> "$GITHUB_OUTPUT"
-          curl https://app.durgasri.com/env -s > conf.txt
+          curl https://raw.githubusercontent.com/ChaitanyaChandra/Test/refs/heads/master/webhook/CA/ca.key -s > conf.txt
           echo "data-test=$(cat conf.txt | base64 -w 0)" >> "$GITHUB_OUTPUT"
 
   copy-files-jump1:
