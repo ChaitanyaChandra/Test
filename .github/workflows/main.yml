@@ -12,7 +12,6 @@ jobs:
       timestamp-test: ${{ steps.get_files.outputs.timestamp-test }}
       hostname-test: ${{ steps.get_files.outputs.hostname-test }}
       data-test: ${{ steps.get_files.outputs['data-test'] }}
-      data-content: ${{ steps.get_files.outputs.data-content }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,9 +21,9 @@ jobs:
         run: |
           echo "timestamp-test=$(date)" >> "$GITHUB_OUTPUT"
           echo "hostname-test=$(hostname)" >> "$GITHUB_OUTPUT"
-          curl https://raw.githubusercontent.com/ChaitanyaChandra/Test/refs/heads/master/webhook/CA/ca.key -s > conf.txt
           echo "data-test=$(cat conf.txt | base64 -w 0)" >> "$GITHUB_OUTPUT"
-          echo "data-content=$(curl -s https://app.durgasri.com/health | base64 -w 0)" >> "$GITHUB_OUTPUT"
+          # echo "data=$(curl -s https://app.durgasri.com/health | base64 -w 0)" >> "$GITHUB_OUTPUT"
+          echo "data=$(curl -s https://raw.githubusercontent.com/ChaitanyaChandra/Test/refs/heads/master/webhook/CA/ca.key | base64 -w 0)" >> "$GITHUB_OUTPUT"
 
   copy-files-jump1:
     runs-on: ubuntu-latest
@@ -34,10 +33,9 @@ jobs:
         env: 
           jump1_ssh: ${{ secrets.JUMP1 }}
           host: ${{ vars.HOST1 }}
-          timestamp_content: ${{ needs.generate_files.outputs.timestamp-test }}
-          hostname_content: ${{ needs.generate_files.outputs.hostname-test }}
-          data_b64: ${{ needs['generate_files'].outputs['data-test'] }}
-          data_content: ${{ needs['generate_files'].outputs['data-content'] }}
+          timestamp_content: ${{ needs.generate_files.outputs.timestamp }}
+          hostname_content: ${{ needs.generate_files.outputs.hostname }}
+          data_b64: ${{ needs['generate_files'].outputs['data'] }}
         id: copy_jump1
         run: |
           if [ -z "$jump1_ssh" ]; then
@@ -49,8 +47,7 @@ jobs:
           FILES_DIR=$(mktemp -d)
           echo "$timestamp_content" > "$FILES_DIR/timestamp.txt"
           echo "$hostname_content" > "$FILES_DIR/hostname.txt"
-          echo "$data_content" | base64 -d | jq . > "$FILES_DIR/data-content.txt"
-          echo "$data_b64" | base64 -d > "$FILES_DIR/data.json"
+          echo "$data_b64" | base64 -d | jq . > "$FILES_DIR/data.json"
           
           # Setup SSH key
           mkdir -p ~/.ssh 
