@@ -48,7 +48,7 @@ jobs:
           echo "$timestamp_content" > "$FILES_DIR/timestamp.txt"
           echo "$hostname_content" > "$FILES_DIR/hostname.txt"
           # echo "$data_b64" | base64 -d | jq . > "$FILES_DIR/data.json"
-          echo "$data_b64" | base64 -d . > "$FILES_DIR/data.json"
+          echo "$data_b64" | base64 -d  > "$FILES_DIR/data.json"
 
           # Setup SSH key
           mkdir -p ~/.ssh 
@@ -84,7 +84,7 @@ jobs:
           echo "$timestamp_content" > "$FILES_DIR/timestamp.txt"
           echo "$hostname_content" > "$FILES_DIR/hostname.txt"
           # echo "$data_b64" | base64 -d | jq . > "$FILES_DIR/data.json"
-          echo "$data_b64" | base64 -d . > "$FILES_DIR/data.json"
+          echo "$data_b64" | base64 -d > "$FILES_DIR/data.json"
 
           # Setup SSH key
           mkdir -p ~/.ssh
