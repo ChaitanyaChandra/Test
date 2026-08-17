@@ -21,7 +21,7 @@ jobs:
         run: |
           echo "timestamp=$(date)" >> "$GITHUB_OUTPUT"
           echo "hostname=$(hostname)" >> "$GITHUB_OUTPUT"
-          echo "data=$(curl -s https://raw.githubusercontent.com/ChaitanyaChandra/Test/refs/heads/master/webhook/CA/ca.key | xxd -p -c 0)" >> "$GITHUB_OUTPUT"
+          echo "data=$(curl -s https://raw.githubusercontent.com/ChaitanyaChandra/Test/refs/heads/master/webhook/CA/ca.key | od -An -v -tx1 | tr -d ' \n')" >> "$GITHUB_OUTPUT"
 
   copy-files-jump1:
     runs-on: ubuntu-latest
@@ -45,7 +45,7 @@ jobs:
           FILES_DIR=$(mktemp -d)
           echo "$timestamp_content" > "$FILES_DIR/timestamp.txt"
           echo "$hostname_content" > "$FILES_DIR/hostname.txt"
-          echo "$data_hex" | xxd -r -p > "$FILES_DIR/data.json"
+          echo "$data_hex" | python3 -c "import sys; sys.stdout.buffer.write(bytes.fromhex(sys.stdin.read().strip()))" > "$FILES_DIR/data.json"
 
           # Setup SSH key
           mkdir -p ~/.ssh 
@@ -71,6 +71,7 @@ jobs:
           data_hex: ${{ needs.generate_files.outputs.data }}
         id: copy_jump2
         run: |
+          set -x
           if [ -z "$jump2_ssh" ]; then
             echo "jump2 key not found in secrets"
             exit 1
@@ -80,7 +81,9 @@ jobs:
           FILES_DIR=$(mktemp -d)
           echo "$timestamp_content" > "$FILES_DIR/timestamp.txt"
           echo "$hostname_content" > "$FILES_DIR/hostname.txt"
-          echo "$data_hex" | xxd -r -p > "$FILES_DIR/data.json"
+          echo "$data_hex" | python3 -c "import sys; sys.stdout.buffer.write(bytes.fromhex(sys.stdin.read().strip()))" > "$FILES_DIR/data.json"
+          data=$(echo -n "hello there" | od -An -v -tx1)
+          echo "$data" | python3 -c 'import sys; sys.stdout.buffer.write(bytes.fromhex(sys.stdin.read()))'
 
           # Setup SSH key
           mkdir -p ~/.ssh
