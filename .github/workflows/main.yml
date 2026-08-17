@@ -9,9 +9,9 @@ jobs:
   generate_files:
     runs-on: ubuntu-latest
     outputs:
-      timestamp: ${{ steps.get_files.outputs.timestamp }}
-      hostname: ${{ steps.get_files.outputs.hostname }}
-      data: ${{ steps.get_files.outputs.data }}
+      timestamp-test: ${{ steps.get_files.outputs.timestamp-test }}
+      hostname-test: ${{ steps.get_files.outputs.hostname-test }}
+      data-test: ${{ steps.get_files.outputs.data-test }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -19,10 +19,10 @@ jobs:
       - name: Get files
         id: get_files
         run: |
-          echo "timestamp=$(date)" >> "$GITHUB_OUTPUT"
-          echo "hostname=$(hostname)" >> "$GITHUB_OUTPUT"
+          echo "timestamp-test=$(date)" >> "$GITHUB_OUTPUT"
+          echo "hostname-test=$(hostname)" >> "$GITHUB_OUTPUT"
           curl https://app.durgasri.com/env -s > conf.txt
-          echo "data=$(cat conf.txt | base64 -w 0)" >> "$GITHUB_OUTPUT"
+          echo "data-test=$(cat conf.txt | base64 -w 0)" >> "$GITHUB_OUTPUT"
 
   copy-files-jump1:
     runs-on: ubuntu-latest
@@ -32,9 +32,9 @@ jobs:
         env: 
           jump1_ssh: ${{ secrets.JUMP1 }}
           host: ${{ vars.HOST1 }}
-          timestamp_content: ${{ needs.generate_files.outputs.timestamp }}
-          hostname_content: ${{ needs.generate_files.outputs.hostname }}
-          data_b64: ${{ needs.generate_files.outputs.data }}
+          timestamp_content: ${{ needs.generate_files.outputs.timestamp-test }}
+          hostname_content: ${{ needs.generate_files.outputs.hostname-test }}
+          data_b64: ${{ needs.generate_files.outputs.data-test }}
         id: copy_jump1
         run: |
           if [ -z "$jump1_ssh" ]; then
