@@ -34,7 +34,7 @@ jobs:
           host: ${{ vars.HOST1 }}
           timestamp_content: ${{ needs.generate_files.outputs.timestamp-test }}
           hostname_content: ${{ needs.generate_files.outputs.hostname-test }}
-          data_b64: ${{ needs.generate_files.outputs['data-test'] }}
+          data_b64: ${{ needs['generate_files']outputs['data-test'] }}
         id: copy_jump1
         run: |
           if [ -z "$jump1_ssh" ]; then
