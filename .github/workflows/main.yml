@@ -27,6 +27,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: generate_files
     steps:
+      - name: Mask data
+        run: echo "::add-mask::${{ needs.generate_files.outputs.data }}"
+
       - name: copy files to jump1
         env: 
           jump1_ssh: ${{ secrets.JUMP1 }}
@@ -63,6 +66,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: generate_files
     steps:
+      - name: Mask data
+        run: echo "::add-mask::${{ needs.generate_files.outputs.data }}"
+
       - name: copy files to jump2
         env: 
           jump2_ssh: ${{ secrets.JUMP1 }}
