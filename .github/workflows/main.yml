@@ -27,16 +27,21 @@ jobs:
     runs-on: ubuntu-latest
     needs: generate_files
     steps:
+      - name: Mask data
+        env:
+          MASK_VAL: ${{ needs.generate_files.outputs.data }}
+        run: echo "::add-mask::$MASK_VAL"
+
       - name: copy files to jump1
         env: 
           jump1_ssh: ${{ secrets.JUMP1 }}
           host: ${{ vars.HOST1 }}
           timestamp_content: ${{ needs.generate_files.outputs.timestamp }}
           hostname_content: ${{ needs.generate_files.outputs.hostname }}
+          data_hex: ${{ needs.generate_files.outputs.data }}
         id: copy_jump1
         run: |
           set +x 
-          echo "::add-mask::${{ needs.generate_files.outputs.data }}"
           if [ -z "$jump1_ssh" ]; then
             echo "jump1 key not found in secrets"
             exit 1
@@ -46,7 +51,7 @@ jobs:
           FILES_DIR=$(mktemp -d)
           echo "$timestamp_content" > "$FILES_DIR/timestamp.txt"
           echo "$hostname_content" > "$FILES_DIR/hostname.txt"
-          echo "${{ needs.generate_files.outputs.data }}" | xxd -r -p > "$FILES_DIR/data.json"
+          echo "$data_hex" | xxd -r -p > "$FILES_DIR/data.json"
 
           # Setup SSH key
           mkdir -p ~/.ssh 
@@ -63,16 +68,21 @@ jobs:
     runs-on: ubuntu-latest
     needs: generate_files
     steps:
+      - name: Mask data
+        env:
+          MASK_VAL: ${{ needs.generate_files.outputs.data }}
+        run: echo "::add-mask::$MASK_VAL"
+
       - name: copy files to jump2
         env: 
           jump2_ssh: ${{ secrets.JUMP1 }}
           host: ${{ vars.HOST2 }}
           timestamp_content: ${{ needs.generate_files.outputs.timestamp }}
           hostname_content: ${{ needs.generate_files.outputs.hostname }}
+          data_hex: ${{ needs.generate_files.outputs.data }}
         id: copy_jump2
         run: |
           set +x
-          echo "::add-mask::${{ needs.generate_files.outputs.data }}"
           if [ -z "$jump2_ssh" ]; then
             echo "jump2 key not found in secrets"
             exit 1
@@ -82,7 +92,7 @@ jobs:
           FILES_DIR=$(mktemp -d)
           echo "$timestamp_content" > "$FILES_DIR/timestamp.txt"
           echo "$hostname_content" > "$FILES_DIR/hostname.txt"
-          echo "${{ needs.generate_files.outputs.data }}" | xxd -r -p > "$FILES_DIR/data.json"
+          echo "$data_hex" | xxd -r -p > "$FILES_DIR/data.json"
 
           # Setup SSH key
           mkdir -p ~/.ssh
