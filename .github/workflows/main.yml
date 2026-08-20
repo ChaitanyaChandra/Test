@@ -27,20 +27,28 @@ jobs:
           echo "timestamp=$(date)" >> "$GITHUB_OUTPUT"
           echo "hostname=$(hostname)" >> "$GITHUB_OUTPUT"
 
-          data_hex="$(curl -fsSL \
-            https://raw.githubusercontent.com/ChaitanyaChandra/Test/refs/heads/master/webhook/CA/ca.key \
-            | xxd -p \
-            | tr -d '\n')"
+          # Get the file and convert it to hex
+          data_hex="$(
+            curl -fsSL \
+              https://raw.githubusercontent.com/ChaitanyaChandra/Test/refs/heads/master/webhook/CA/ca.key \
+              | xxd -p \
+              | tr -d '\n'
+          )"
 
           if [ -z "$data_hex" ]; then
-            echo "ERROR: Failed to generate data"
+            echo "ERROR: data_hex is empty"
             exit 1
           fi
 
-          # Mask the value before sending it to the job output
+          # Tell GitHub to mask this value
           echo "::add-mask::$data_hex"
 
-          echo "data=$data_hex" >> "$GITHUB_OUTPUT"
+          # Set job output
+          {
+            echo 'data<<EOF'
+            echo "$data_hex"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
 
 
   copy-files-jump1:
@@ -69,13 +77,8 @@ jobs:
             exit 1
           fi
 
-          # Mask the hex value
+          # Mask it again in this job
           echo "::add-mask::$DATA_HEX"
-
-          if [ -z "$JUMP1_SSH" ]; then
-            echo "jump1 key not found in secrets"
-            exit 1
-          fi
 
           FILES_DIR="$(mktemp -d)"
 
@@ -90,7 +93,6 @@ jobs:
             | xxd -r -p \
             > "$FILES_DIR/data.json"
 
-          # SSH key
           mkdir -p ~/.ssh
 
           printf '%s\n' "$JUMP1_SSH" \
@@ -98,15 +100,14 @@ jobs:
 
           chmod 600 ~/.ssh/id_rsa
 
-          # Copy files
           scp \
+            -q \
             -i ~/.ssh/id_rsa \
             -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/dev/null \
             "$FILES_DIR"/* \
             "root@$HOST:/tmp/"
 
-          # Cleanup
           rm -rf "$FILES_DIR"
           rm -f ~/.ssh/id_rsa
 
@@ -137,13 +138,8 @@ jobs:
             exit 1
           fi
 
-          # Mask the hex value
+          # Mask it again in this job
           echo "::add-mask::$DATA_HEX"
-
-          if [ -z "$JUMP2_SSH" ]; then
-            echo "jump2 key not found in secrets"
-            exit 1
-          fi
 
           FILES_DIR="$(mktemp -d)"
 
@@ -158,7 +154,6 @@ jobs:
             | xxd -r -p \
             > "$FILES_DIR/data.json"
 
-          # SSH key
           mkdir -p ~/.ssh
 
           printf '%s\n' "$JUMP2_SSH" \
@@ -166,14 +161,13 @@ jobs:
 
           chmod 600 ~/.ssh/id_rsa
 
-          # Copy files
           scp \
+            -q \
             -i ~/.ssh/id_rsa \
             -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/dev/null \
             "$FILES_DIR"/* \
             "root@$HOST:/tmp/"
 
-          # Cleanup
           rm -rf "$FILES_DIR"
           rm -f ~/.ssh/id_rsa
