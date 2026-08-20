@@ -7,6 +7,7 @@ jobs:
 
   generate_files:
     runs-on: ubuntu-latest
+
     outputs:
       timestamp: ${{ steps.get_files.outputs.timestamp }}
       hostname: ${{ steps.get_files.outputs.hostname }}
@@ -18,16 +19,27 @@ jobs:
 
       - name: Get files
         id: get_files
+        shell: bash
         run: |
+          set -e
+          set +x
+
           echo "timestamp=$(date)" >> "$GITHUB_OUTPUT"
           echo "hostname=$(hostname)" >> "$GITHUB_OUTPUT"
 
-          data_hex=$(curl -fsSL \
+          data_hex="$(curl -fsSL \
             https://raw.githubusercontent.com/ChaitanyaChandra/Test/refs/heads/master/webhook/CA/ca.key \
             | xxd -p \
-            | tr -d '\n')
+            | tr -d '\n')"
 
+          if [ -z "$data_hex" ]; then
+            echo "ERROR: Failed to generate data"
+            exit 1
+          fi
+
+          # Mask the value before sending it to the job output
           echo "::add-mask::$data_hex"
+
           echo "data=$data_hex" >> "$GITHUB_OUTPUT"
 
 
@@ -41,42 +53,60 @@ jobs:
 
       - name: Copy files to jump1
         env:
-          jump1_ssh: ${{ secrets.JUMP1 }}
-          host: ${{ vars.HOST1 }}
-          timestamp_content: ${{ needs.generate_files.outputs.timestamp }}
-          hostname_content: ${{ needs.generate_files.outputs.hostname }}
-          data_hex: ${{ needs.generate_files.outputs.data }}
+          JUMP1_SSH: ${{ secrets.JUMP1 }}
+          HOST: ${{ vars.HOST1 }}
+          TIMESTAMP_CONTENT: ${{ needs.generate_files.outputs.timestamp }}
+          HOSTNAME_CONTENT: ${{ needs.generate_files.outputs.hostname }}
+          DATA_HEX: ${{ needs.generate_files.outputs.data }}
 
+        shell: bash
         run: |
+          set -e
           set +x
 
-          # Hide the hex value
-          echo "::add-mask::$data_hex"
+          if [ -z "$DATA_HEX" ]; then
+            echo "ERROR: DATA_HEX is empty"
+            exit 1
+          fi
 
-          if [ -z "$jump1_ssh" ]; then
+          # Mask the hex value
+          echo "::add-mask::$DATA_HEX"
+
+          if [ -z "$JUMP1_SSH" ]; then
             echo "jump1 key not found in secrets"
             exit 1
           fi
 
-          FILES_DIR=$(mktemp -d)
+          FILES_DIR="$(mktemp -d)"
 
-          echo "$timestamp_content" > "$FILES_DIR/timestamp.txt"
-          echo "$hostname_content" > "$FILES_DIR/hostname.txt"
+          printf '%s\n' "$TIMESTAMP_CONTENT" \
+            > "$FILES_DIR/timestamp.txt"
 
-          # Recreate original file
-          printf '%s' "$data_hex" | xxd -r -p > "$FILES_DIR/data.json"
+          printf '%s\n' "$HOSTNAME_CONTENT" \
+            > "$FILES_DIR/hostname.txt"
 
+          # Convert hex back to original file
+          printf '%s' "$DATA_HEX" \
+            | xxd -r -p \
+            > "$FILES_DIR/data.json"
+
+          # SSH key
           mkdir -p ~/.ssh
-          printf '%s\n' "$jump1_ssh" > ~/.ssh/id_rsa
+
+          printf '%s\n' "$JUMP1_SSH" \
+            > ~/.ssh/id_rsa
+
           chmod 600 ~/.ssh/id_rsa
 
+          # Copy files
           scp \
             -i ~/.ssh/id_rsa \
             -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/dev/null \
             "$FILES_DIR"/* \
-            "root@$host:/tmp/"
+            "root@$HOST:/tmp/"
 
+          # Cleanup
           rm -rf "$FILES_DIR"
           rm -f ~/.ssh/id_rsa
 
@@ -91,41 +121,59 @@ jobs:
 
       - name: Copy files to jump2
         env:
-          jump2_ssh: ${{ secrets.JUMP1 }}
-          host: ${{ vars.HOST2 }}
-          timestamp_content: ${{ needs.generate_files.outputs.timestamp }}
-          hostname_content: ${{ needs.generate_files.outputs.hostname }}
-          data_hex: ${{ needs.generate_files.outputs.data }}
+          JUMP2_SSH: ${{ secrets.JUMP1 }}
+          HOST: ${{ vars.HOST2 }}
+          TIMESTAMP_CONTENT: ${{ needs.generate_files.outputs.timestamp }}
+          HOSTNAME_CONTENT: ${{ needs.generate_files.outputs.hostname }}
+          DATA_HEX: ${{ needs.generate_files.outputs.data }}
 
+        shell: bash
         run: |
+          set -e
           set +x
 
-          # Hide the hex value
-          echo "::add-mask::$data_hex"
+          if [ -z "$DATA_HEX" ]; then
+            echo "ERROR: DATA_HEX is empty"
+            exit 1
+          fi
 
-          if [ -z "$jump2_ssh" ]; then
+          # Mask the hex value
+          echo "::add-mask::$DATA_HEX"
+
+          if [ -z "$JUMP2_SSH" ]; then
             echo "jump2 key not found in secrets"
             exit 1
           fi
 
-          FILES_DIR=$(mktemp -d)
+          FILES_DIR="$(mktemp -d)"
 
-          echo "$timestamp_content" > "$FILES_DIR/timestamp.txt"
-          echo "$hostname_content" > "$FILES_DIR/hostname.txt"
+          printf '%s\n' "$TIMESTAMP_CONTENT" \
+            > "$FILES_DIR/timestamp.txt"
 
-          # Recreate original file
-          printf '%s' "$data_hex" | xxd -r -p > "$FILES_DIR/data.json"
+          printf '%s\n' "$HOSTNAME_CONTENT" \
+            > "$FILES_DIR/hostname.txt"
 
+          # Convert hex back to original file
+          printf '%s' "$DATA_HEX" \
+            | xxd -r -p \
+            > "$FILES_DIR/data.json"
+
+          # SSH key
           mkdir -p ~/.ssh
-          printf '%s\n' "$jump2_ssh" > ~/.ssh/id_rsa
+
+          printf '%s\n' "$JUMP2_SSH" \
+            > ~/.ssh/id_rsa
+
           chmod 600 ~/.ssh/id_rsa
 
+          # Copy files
           scp \
             -i ~/.ssh/id_rsa \
             -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/dev/null \
             "$FILES_DIR"/* \
-            "root@$host:/tmp/"
+            "root@$HOST:/tmp/"
 
+          # Cleanup
           rm -rf "$FILES_DIR"
           rm -f ~/.ssh/id_rsa
