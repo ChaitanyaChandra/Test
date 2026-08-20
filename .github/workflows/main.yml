@@ -3,171 +3,111 @@ name: System Info Summary
 on:
   workflow_dispatch:
 
+  
 jobs:
 
   generate_files:
     runs-on: ubuntu-latest
-
     outputs:
       timestamp: ${{ steps.get_files.outputs.timestamp }}
       hostname: ${{ steps.get_files.outputs.hostname }}
       data: ${{ steps.get_files.outputs.data }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Get files
         id: get_files
-        shell: bash
         run: |
-          set -e
-          set +x
-
           echo "timestamp=$(date)" >> "$GITHUB_OUTPUT"
           echo "hostname=$(hostname)" >> "$GITHUB_OUTPUT"
-
-          # Get the file and convert it to hex
-          data_hex="$(
-            curl -fsSL \
-              https://raw.githubusercontent.com/ChaitanyaChandra/Test/refs/heads/master/webhook/CA/ca.key \
-              | xxd -p \
-              | tr -d '\n'
-          )"
-
-          if [ -z "$data_hex" ]; then
-            echo "ERROR: data_hex is empty"
-            exit 1
-          fi
-
-          # Tell GitHub to mask this value
-          echo "::add-mask::$data_hex"
-
-          # Set job output
-          {
-            echo 'data<<EOF'
-            echo "$data_hex"
-            echo 'EOF'
-          } >> "$GITHUB_OUTPUT"
-
+          echo "data=$(curl -s https://raw.githubusercontent.com/ChaitanyaChandra/Test/refs/heads/master/webhook/CA/ca.key | xxd -p | tr -d '\n')" >> "$GITHUB_OUTPUT"
 
   copy-files-jump1:
     runs-on: ubuntu-latest
     needs: generate_files
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Copy files to jump1
-        env:
-          JUMP1_SSH: ${{ secrets.JUMP1 }}
-          HOST: ${{ vars.HOST1 }}
-          TIMESTAMP_CONTENT: ${{ needs.generate_files.outputs.timestamp }}
-          HOSTNAME_CONTENT: ${{ needs.generate_files.outputs.hostname }}
-          DATA_HEX: ${{ needs.generate_files.outputs.data }}
+      - name: Mask data
+        run: | 
+          set +x 
+          MASK_VAL="${{ needs.generate_files.outputs.data }}"
+          echo "::add-mask::$MASK_VAL"
 
-        shell: bash
+      - name: copy files to jump1
+        env: 
+          jump1_ssh: ${{ secrets.JUMP1 }}
+          host: ${{ vars.HOST1 }}
+          timestamp_content: ${{ needs.generate_files.outputs.timestamp }}
+          hostname_content: ${{ needs.generate_files.outputs.hostname }}
+        id: copy_jump1
         run: |
-          set -e
-          set +x
-
-          if [ -z "$DATA_HEX" ]; then
-            echo "ERROR: DATA_HEX is empty"
+          set +x 
+          if [ -z "$jump1_ssh" ]; then
+            echo "jump1 key not found in secrets"
             exit 1
           fi
+          
+          # Recreate files locally
+          FILES_DIR=$(mktemp -d)
+          echo "$timestamp_content" > "$FILES_DIR/timestamp.txt"
+          echo "$hostname_content" > "$FILES_DIR/hostname.txt"
+          echo "$data_hex" | xxd -r -p > "$FILES_DIR/data.json"
 
-          # Mask it again in this job
-          echo "::add-mask::$DATA_HEX"
-
-          FILES_DIR="$(mktemp -d)"
-
-          printf '%s\n' "$TIMESTAMP_CONTENT" \
-            > "$FILES_DIR/timestamp.txt"
-
-          printf '%s\n' "$HOSTNAME_CONTENT" \
-            > "$FILES_DIR/hostname.txt"
-
-          # Convert hex back to original file
-          printf '%s' "$DATA_HEX" \
-            | xxd -r -p \
-            > "$FILES_DIR/data.json"
-
-          mkdir -p ~/.ssh
-
-          printf '%s\n' "$JUMP1_SSH" \
-            > ~/.ssh/id_rsa
-
+          # Setup SSH key
+          mkdir -p ~/.ssh 
+          echo "$jump1_ssh" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-
-          scp \
-            -q \
-            -i ~/.ssh/id_rsa \
-            -o StrictHostKeyChecking=no \
-            -o UserKnownHostsFile=/dev/null \
-            "$FILES_DIR"/* \
-            "root@$HOST:/tmp/"
-
-          rm -rf "$FILES_DIR"
-          rm -f ~/.ssh/id_rsa
-
-
+          
+          # Copy files via scp
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$FILES_DIR"/* "root@$host:/tmp/"
+          
+          # Clean up
+          rm -rf "$FILES_DIR" ~/.ssh/id_rsa
+          
   copy-files-jump2:
     runs-on: ubuntu-latest
     needs: generate_files
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Copy files to jump2
-        env:
-          JUMP2_SSH: ${{ secrets.JUMP1 }}
-          HOST: ${{ vars.HOST2 }}
-          TIMESTAMP_CONTENT: ${{ needs.generate_files.outputs.timestamp }}
-          HOSTNAME_CONTENT: ${{ needs.generate_files.outputs.hostname }}
-          DATA_HEX: ${{ needs.generate_files.outputs.data }}
+      - name: Mask data
+        run: | 
+          set +x 
+          MASK_VAL="${{ needs.generate_files.outputs.data }}"
+          echo "::add-mask::$MASK_VAL"
 
-        shell: bash
+      - name: copy files to jump2
+        env: 
+          jump2_ssh: ${{ secrets.JUMP1 }}
+          host: ${{ vars.HOST2 }}
+          timestamp_content: ${{ needs.generate_files.outputs.timestamp }}
+          hostname_content: ${{ needs.generate_files.outputs.hostname }}
+        id: copy_jump2
         run: |
-          set -e
           set +x
-
-          if [ -z "$DATA_HEX" ]; then
-            echo "ERROR: DATA_HEX is empty"
+          if [ -z "$jump2_ssh" ]; then
+            echo "jump2 key not found in secrets"
             exit 1
           fi
+          
+          # Recreate files locally
+          FILES_DIR=$(mktemp -d)
+          echo "$timestamp_content" > "$FILES_DIR/timestamp.txt"
+          echo "$hostname_content" > "$FILES_DIR/hostname.txt"
+          echo "$data_hex" | xxd -r -p > "$FILES_DIR/data.json"
 
-          # Mask it again in this job
-          echo "::add-mask::$DATA_HEX"
-
-          FILES_DIR="$(mktemp -d)"
-
-          printf '%s\n' "$TIMESTAMP_CONTENT" \
-            > "$FILES_DIR/timestamp.txt"
-
-          printf '%s\n' "$HOSTNAME_CONTENT" \
-            > "$FILES_DIR/hostname.txt"
-
-          # Convert hex back to original file
-          printf '%s' "$DATA_HEX" \
-            | xxd -r -p \
-            > "$FILES_DIR/data.json"
-
+          # Setup SSH key
           mkdir -p ~/.ssh
-
-          printf '%s\n' "$JUMP2_SSH" \
-            > ~/.ssh/id_rsa
-
+          echo "$jump2_ssh" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          
+          # Copy files via scp
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$FILES_DIR"/* "root@$host:/tmp/"
+          
+          # Clean up
+          rm -rf "$FILES_DIR" ~/.ssh/id_rsa
 
-          scp \
-            -q \
-            -i ~/.ssh/id_rsa \
-            -o StrictHostKeyChecking=no \
-            -o UserKnownHostsFile=/dev/null \
-            "$FILES_DIR"/* \
-            "root@$HOST:/tmp/"
-
-          rm -rf "$FILES_DIR"
-          rm -f ~/.ssh/id_rsa
