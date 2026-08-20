@@ -36,6 +36,7 @@ jobs:
           data_hex: ${{ needs.generate_files.outputs.data }}
         id: copy_jump1
         run: |
+          set +x 
           if [ -z "$jump1_ssh" ]; then
             echo "jump1 key not found in secrets"
             exit 1
@@ -71,7 +72,7 @@ jobs:
           data_hex: ${{ needs.generate_files.outputs.data }}
         id: copy_jump2
         run: |
-          set -x
+          set +x
           if [ -z "$jump2_ssh" ]; then
             echo "jump2 key not found in secrets"
             exit 1
