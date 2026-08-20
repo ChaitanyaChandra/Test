@@ -28,9 +28,11 @@ jobs:
     needs: generate_files
     steps:
       - name: Mask data
-        env:
-          MASK_VAL: ${{ needs.generate_files.outputs.data }}
-        run: echo "::add-mask::$MASK_VAL"
+        run: |
+          set +x 
+          echo "::add-mask::${{ needs.generate_files.outputs.data }}"
+          echo "data_hex=${{ needs.generate_files.outputs.data }}" >> "$GITHUB_ENV"
+
 
       - name: copy files to jump1
         env: 
@@ -38,7 +40,6 @@ jobs:
           host: ${{ vars.HOST1 }}
           timestamp_content: ${{ needs.generate_files.outputs.timestamp }}
           hostname_content: ${{ needs.generate_files.outputs.hostname }}
-          data_hex: ${{ needs.generate_files.outputs.data }}
         id: copy_jump1
         run: |
           set +x 
@@ -69,9 +70,10 @@ jobs:
     needs: generate_files
     steps:
       - name: Mask data
-        env:
-          MASK_VAL: ${{ needs.generate_files.outputs.data }}
-        run: echo "::add-mask::$MASK_VAL"
+        run: |
+          set +x 
+          echo "::add-mask::${{ needs.generate_files.outputs.data }}"
+          echo "data_hex=${{ needs.generate_files.outputs.data }}" >> "$GITHUB_ENV"
 
       - name: copy files to jump2
         env: 
@@ -79,7 +81,6 @@ jobs:
           host: ${{ vars.HOST2 }}
           timestamp_content: ${{ needs.generate_files.outputs.timestamp }}
           hostname_content: ${{ needs.generate_files.outputs.hostname }}
-          data_hex: ${{ needs.generate_files.outputs.data }}
         id: copy_jump2
         run: |
           set +x
