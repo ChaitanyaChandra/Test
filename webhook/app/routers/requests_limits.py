@@ -2,6 +2,7 @@ import logging
 import aiomysql
 import os
 from fastapi import APIRouter, Request
+import json
 
 from app.routers.defaults import (
     default_response,
@@ -113,9 +114,8 @@ async def get_resource_values(
 async def requests_limits_mutation(request: Request):
 
     body = await request.json()
-    sanitized_body = str(body).replace('\r\n', '').replace('\n', '')
     logging.debug("Request body ========= ******** ==========")
-    logging.debug(sanitized_body)
+    logging.debug(json.dumps(body, separators=(",", ":")))
     logging.debug("Request body ========= ******** ==========")
     # ---------------------------------------------------------
     # Admission response
