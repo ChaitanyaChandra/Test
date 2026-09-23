@@ -12,7 +12,7 @@ from routers.defaults import (
 
 router = APIRouter(
     tags=["update resource requests and limits to deployments"],
-    prefix="/requests-limits",
+    prefix="/requests-limits"
 )
 
 
@@ -26,19 +26,14 @@ DB_CONFIG = {
 }
 
 
-# ---------------------------------------------------------
-# CPU conversion
-# ---------------------------------------------------------
-
 def cpu_to_milli_cpu(cpu):
     """
-    Kubernetes CPU -> milli CPU
+    Convert Kubernetes CPU value to milli CPU.
 
-    Examples:
-        100m  -> 100
-        500m  -> 500
-        1     -> 1000
-        0.5   -> 500
+    100m -> 100
+    500m -> 500
+    1    -> 1000
+    0.5  -> 500
     """
 
     if cpu is None:
@@ -52,19 +47,14 @@ def cpu_to_milli_cpu(cpu):
     return int(float(cpu) * 1000)
 
 
-# ---------------------------------------------------------
-# Memory conversion
-# ---------------------------------------------------------
-
 def memory_to_mb(memory):
     """
-    Kubernetes memory -> MB/MiB
+    Convert Kubernetes memory value to MB/MiB.
 
-    Examples:
-        256Mi -> 256
-        512Mi -> 512
-        1Gi   -> 1024
-        128Ki -> 0
+    256Mi -> 256
+    512Mi -> 512
+    1Gi   -> 1024
+    1024Ki -> 1
     """
 
     if memory is None:
@@ -87,10 +77,6 @@ def memory_to_mb(memory):
     # Plain Kubernetes memory value is bytes
     return int(int(memory) / (1024 * 1024))
 
-
-# ---------------------------------------------------------
-# Get desired resource values from MySQL
-# ---------------------------------------------------------
 
 async def get_resource_values(
     namespace: str,
@@ -123,10 +109,6 @@ async def get_resource_values(
         connection.close()
 
 
-# ---------------------------------------------------------
-# Mutation webhook
-# ---------------------------------------------------------
-
 @router.post("/mutate")
 async def requests_limits_mutation(request: Request):
 
@@ -135,9 +117,9 @@ async def requests_limits_mutation(request: Request):
     logging.debug("Request body")
     logging.debug(f"{body}")
 
-    # -----------------------------------------------------
+    # ---------------------------------------------------------
     # Admission response
-    # -----------------------------------------------------
+    # ---------------------------------------------------------
 
     uid = body["request"]["uid"]
 
@@ -146,9 +128,9 @@ async def requests_limits_mutation(request: Request):
     patchset = []
     error_msgs = []
 
-    # -----------------------------------------------------
+    # ---------------------------------------------------------
     # Kubernetes object
-    # -----------------------------------------------------
+    # ---------------------------------------------------------
 
     obj = body["request"].get("object", {})
 
@@ -160,9 +142,9 @@ async def requests_limits_mutation(request: Request):
 
     namespace = metadata.get("namespace", "default")
 
-    # -----------------------------------------------------
+    # ---------------------------------------------------------
     # Only process Deployments
-    # -----------------------------------------------------
+    # ---------------------------------------------------------
 
     if kind != "Deployment":
 
@@ -173,14 +155,14 @@ async def requests_limits_mutation(request: Request):
 
         return output_response(json_res)
 
-    # -----------------------------------------------------
+    # ---------------------------------------------------------
     # Deployment containers
     #
     # spec:
     #   template:
     #     spec:
     #       containers:
-    # -----------------------------------------------------
+    # ---------------------------------------------------------
 
     containers = (
         obj
@@ -190,9 +172,9 @@ async def requests_limits_mutation(request: Request):
         .get("containers", [])
     )
 
-    # -----------------------------------------------------
+    # ---------------------------------------------------------
     # Process every container
-    # -----------------------------------------------------
+    # ---------------------------------------------------------
 
     for index, container in enumerate(containers):
 
@@ -201,9 +183,9 @@ async def requests_limits_mutation(request: Request):
         if not container_name:
             continue
 
-        # -------------------------------------------------
-        # Get desired resource values from DB
-        # -------------------------------------------------
+        # -----------------------------------------------------
+        # Get desired values from MySQL
+        # -----------------------------------------------------
 
         desired = await get_resource_values(
             namespace=namespace,
@@ -227,85 +209,145 @@ async def requests_limits_mutation(request: Request):
 
         desired_mb_memory = desired["mb_memory"]
 
-        # -------------------------------------------------
-        # Convert DB values to Kubernetes resource values
-        # -------------------------------------------------
+        # -----------------------------------------------------
+        # Convert DB values to Kubernetes values
+        # -----------------------------------------------------
 
         desired_cpu = f"{desired_milli_cpu}m"
 
         desired_memory = f"{desired_mb_memory}Mi"
 
-        # -------------------------------------------------
-        # Current container resources
-        # -------------------------------------------------
+        # -----------------------------------------------------
+        # Check resources
+        #
+        # If resources is not defined, skip.
+        # -----------------------------------------------------
 
-        resources = container.get("resources") or {}
+        resources = container.get("resources")
 
-        current_requests = resources.get("requests") or {}
+        if not resources:
 
-        current_limits = resources.get("limits") or {}
+            logging.debug(
+                f"Skipping container={container_name}: "
+                f"resources is not defined"
+            )
 
-        # =================================================
-        # Convert incoming CPU
-        # =================================================
+            continue
 
-        current_request_cpu = current_requests.get("cpu")
+        # -----------------------------------------------------
+        # Check requests
+        #
+        # If requests is not defined, skip.
+        # -----------------------------------------------------
 
-        current_limit_cpu = current_limits.get("cpu")
+        requests = resources.get("requests")
 
-        current_request_milli_cpu = cpu_to_milli_cpu(
-            current_request_cpu
+        if not requests:
+
+            logging.debug(
+                f"Skipping container={container_name}: "
+                f"requests is not defined"
+            )
+
+            continue
+
+        # -----------------------------------------------------
+        # Check limits
+        #
+        # If limits is not defined, skip.
+        # -----------------------------------------------------
+
+        limits = resources.get("limits")
+
+        if not limits:
+
+            logging.debug(
+                f"Skipping container={container_name}: "
+                f"limits is not defined"
+            )
+
+            continue
+
+        # -----------------------------------------------------
+        # Current request values
+        # -----------------------------------------------------
+
+        current_request_cpu = requests.get("cpu")
+
+        current_request_memory = requests.get("memory")
+
+        # -----------------------------------------------------
+        # Current limit values
+        # -----------------------------------------------------
+
+        current_limit_cpu = limits.get("cpu")
+
+        current_limit_memory = limits.get("memory")
+
+        # -----------------------------------------------------
+        # Convert incoming CPU values
+        # -----------------------------------------------------
+
+        current_request_milli_cpu = (
+            cpu_to_milli_cpu(current_request_cpu)
+            if current_request_cpu is not None
+            else None
         )
 
-        current_limit_milli_cpu = cpu_to_milli_cpu(
-            current_limit_cpu
+        current_limit_milli_cpu = (
+            cpu_to_milli_cpu(current_limit_cpu)
+            if current_limit_cpu is not None
+            else None
         )
 
-        # =================================================
-        # Convert incoming memory
-        # =================================================
+        # -----------------------------------------------------
+        # Convert incoming memory values
+        # -----------------------------------------------------
 
-        current_request_memory = current_requests.get("memory")
-
-        current_limit_memory = current_limits.get("memory")
-
-        current_request_mb_memory = memory_to_mb(
-            current_request_memory
+        current_request_mb_memory = (
+            memory_to_mb(current_request_memory)
+            if current_request_memory is not None
+            else None
         )
 
-        current_limit_mb_memory = memory_to_mb(
-            current_limit_memory
+        current_limit_mb_memory = (
+            memory_to_mb(current_limit_memory)
+            if current_limit_memory is not None
+            else None
         )
 
         logging.debug(
             f"Container={container_name}, "
-            f"current request CPU={current_request_milli_cpu}m, "
-            f"current request memory={current_request_mb_memory}Mi, "
-            f"current limit CPU={current_limit_milli_cpu}m, "
-            f"current limit memory={current_limit_mb_memory}Mi, "
-            f"desired CPU={desired_milli_cpu}m, "
-            f"desired memory={desired_mb_memory}Mi"
+            f"request_cpu={current_request_milli_cpu}m, "
+            f"request_memory={current_request_mb_memory}Mi, "
+            f"limit_cpu={current_limit_milli_cpu}m, "
+            f"limit_memory={current_limit_mb_memory}Mi, "
+            f"desired_cpu={desired_milli_cpu}m, "
+            f"desired_memory={desired_mb_memory}Mi"
         )
 
-        # =================================================
+        # =====================================================
         # CPU REQUEST
-        # =================================================
+        # =====================================================
 
-        if current_request_milli_cpu != desired_milli_cpu:
+        if (
+            current_request_milli_cpu is not None
+            and current_request_milli_cpu != desired_milli_cpu
+        ):
 
             patchset.append({
-                "op": "add",
+                "op": "replace",
                 "path": (
                     f"/spec/template/spec/containers/"
                     f"{index}/resources/requests/cpu"
                 ),
-                "value": desired_cpu,
+                "value": desired_cpu
             })
 
             msg = (
-                f"Deployment={deployment_name}, "
-                f"container={container_name}: "
-                f"requests.cpu changed from "
+                f"spec.template.spec.containers[{index}]"
+                f".resources.requests.cpu "
+                f"changed from "
                 f"{current_request_milli_cpu}m to "
                 f"{desired_milli_cpu}m"
             )
@@ -314,25 +356,28 @@ async def requests_limits_mutation(request: Request):
 
             error_msgs.append(msg)
 
-        # =================================================
+        # =====================================================
         # MEMORY REQUEST
-        # =================================================
+        # =====================================================
 
-        if current_request_mb_memory != desired_mb_memory:
+        if (
+            current_request_mb_memory is not None
+            and current_request_mb_memory != desired_mb_memory
+        ):
 
             patchset.append({
-                "op": "add",
+                "op": "replace",
                 "path": (
                     f"/spec/template/spec/containers/"
                     f"{index}/resources/requests/memory"
                 ),
-                "value": desired_memory,
+                "value": desired_memory
             })
 
             msg = (
-                f"Deployment={deployment_name}, "
-                f"container={container_name}: "
-                f"requests.memory changed from "
+                f"spec.template.spec.containers[{index}]"
+                f".resources.requests.memory "
+                f"changed from "
                 f"{current_request_mb_memory}Mi to "
                 f"{desired_mb_memory}Mi"
             )
@@ -341,25 +386,28 @@ async def requests_limits_mutation(request: Request):
 
             error_msgs.append(msg)
 
-        # =================================================
+        # =====================================================
         # CPU LIMIT
-        # =================================================
+        # =====================================================
 
-        if current_limit_milli_cpu != desired_milli_cpu:
+        if (
+            current_limit_milli_cpu is not None
+            and current_limit_milli_cpu != desired_milli_cpu
+        ):
 
             patchset.append({
-                "op": "add",
+                "op": "replace",
                 "path": (
                     f"/spec/template/spec/containers/"
                     f"{index}/resources/limits/cpu"
                 ),
-                "value": desired_cpu,
+                "value": desired_cpu
             })
 
             msg = (
-                f"Deployment={deployment_name}, "
-                f"container={container_name}: "
-                f"limits.cpu changed from "
+                f"spec.template.spec.containers[{index}]"
+                f".resources.limits.cpu "
+                f"changed from "
                 f"{current_limit_milli_cpu}m to "
                 f"{desired_milli_cpu}m"
             )
@@ -368,25 +416,28 @@ async def requests_limits_mutation(request: Request):
 
             error_msgs.append(msg)
 
-        # =================================================
+        # =====================================================
         # MEMORY LIMIT
-        # =================================================
+        # =====================================================
 
-        if current_limit_mb_memory != desired_mb_memory:
+        if (
+            current_limit_mb_memory is not None
+            and current_limit_mb_memory != desired_mb_memory
+        ):
 
             patchset.append({
-                "op": "add",
+                "op": "replace",
                 "path": (
                     f"/spec/template/spec/containers/"
                     f"{index}/resources/limits/memory"
                 ),
-                "value": desired_memory,
+                "value": desired_memory
             })
 
             msg = (
-                f"Deployment={deployment_name}, "
-                f"container={container_name}: "
-                f"limits.memory changed from "
+                f"spec.template.spec.containers[{index}]"
+                f".resources.limits.memory "
+                f"changed from "
                 f"{current_limit_mb_memory}Mi to "
                 f"{desired_mb_memory}Mi"
             )
@@ -395,16 +446,16 @@ async def requests_limits_mutation(request: Request):
 
             error_msgs.append(msg)
 
-    # -----------------------------------------------------
+    # ---------------------------------------------------------
     # Apply patches
-    # -----------------------------------------------------
+    # ---------------------------------------------------------
 
     if len(patchset) > 0:
 
         json_res = apply_patchset_to_response(
             json_res,
             patchset,
-            warnings=error_msgs,
+            warnings=error_msgs
         )
 
         json_res["response"]["allowed"] = True
