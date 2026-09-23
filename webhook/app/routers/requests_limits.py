@@ -1,6 +1,6 @@
 import logging
 import aiomysql
-
+import os
 from fastapi import APIRouter, Request
 
 from routers.defaults import (
@@ -17,11 +17,11 @@ router = APIRouter(
 
 
 DB_CONFIG = {
-    "host": "127.0.0.1",
+    "host": os.getenv("DB_HOST"),
     "port": 3306,
-    "user": "YOUR_USER",
-    "password": "YOUR_PASSWORD",
-    "db": "YOUR_DATABASE",
+    "user": os.getenv("DB_USER"),
+    "password": os.getenv("DB_PASSWORD"),
+    "db": "cc",
     "autocommit": True,
 }
 
