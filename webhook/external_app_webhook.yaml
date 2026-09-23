@@ -4,7 +4,7 @@ kind: MutatingWebhookConfiguration
 metadata:
   name: webhook-mutation
 webhooks:
-  - name: requests-limits.webhook.chaitu.net
+  - name: requests-limits.webhook.webhook-service.chaitu.net
     admissionReviewVersions:
       - v1
     sideEffects: None
