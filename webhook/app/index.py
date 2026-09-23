@@ -1,6 +1,6 @@
 import os
 from fastapi import FastAPI
-from routers import validate_rewrite, requests_limits
+from app.routers import validate_rewrite, requests_limits
 import logging
 
 
