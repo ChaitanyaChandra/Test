@@ -2,6 +2,7 @@ import logging
 import aiomysql
 import os
 from fastapi import APIRouter, Request
+import json
 
 from app.routers.defaults import (
     default_response,
@@ -115,7 +116,7 @@ async def requests_limits_mutation(request: Request):
     body = await request.json()
 
     logging.debug("Request body")
-    logging.debug(f"{body}")
+    logging.debug(f"{json.dump(body)}")
 
     # ---------------------------------------------------------
     # Admission response
