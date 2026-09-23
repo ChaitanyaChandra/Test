@@ -98,14 +98,10 @@ async def get_resource_values(
     """
 
     connection = await aiomysql.connect(**DB_CONFIG)
-
     try:
         async with connection.cursor(aiomysql.DictCursor) as cursor:
-
             await cursor.execute(query)
-
             return await cursor.fetchone()
-
     finally:
         connection.close()
 
@@ -150,24 +146,24 @@ async def requests_limits_mutation(request: Request):
             continue
 
         # Get values from MySQL
-        desired = await get_resource_values(
+        cc_data = await get_resource_values(
             namespace=namespace,
             deployment=deployment_name,
             container=container_name,
         )
 
-        if not desired:
+        if not cc_data:
             logging.debug(f"No c_logs entry found for cluster=master, namespace={namespace}, deployment={deployment_name}, container={container_name}")
             continue
 
-        desired_milli_cpu = desired["milli_cpu"]
-        desired_mb_memory = desired["mb_memory"]
+        cc_cpu = cc_data["milli_cpu"]
+        cc_memory = cc_data["mb_memory"]
 
-        # Convert DB values to Kubernetes values
-        desired_cpu = f"{desired_milli_cpu}m"
-        desired_memory = f"{desired_mb_memory}Mi"
+        # Convert DB values to Kubernetes format
+        cc_milli_cpu = f"{cc_cpu}m"
+        cc_mb_memory = f"{cc_memory}Mi"
 
-
+        # get values from request
         resources = container.get("resources")
         if not resources:
             logging.debug(f"Skipping container={container_name}: resources is not defined")
@@ -195,13 +191,12 @@ async def requests_limits_mutation(request: Request):
             else None
         )
 
-
-        logging.debug(f"Container={container_name}, request_cpu={current_request_milli_cpu}m, request_memory={current_request_mb_memory}Mi, limit_cpu={current_limit_milli_cpu}m, limit_memory={current_limit_mb_memory}Mi, desired_cpu={desired_milli_cpu}m, desired_memory={desired_mb_memory}Mi")
+        logging.debug(f"deployment={deployment_name},  Container={container_name}, request_cpu={current_request_milli_cpu}m, request_memory={current_request_mb_memory}Mi, cc_milli_cpu={cc_cpu}m, cc_mb_memory={cc_memory}Mi")
 
         # CPU REQUEST
         if (
             current_request_milli_cpu is not None
-            and current_request_milli_cpu != desired_milli_cpu
+            and current_request_milli_cpu != cc_cpu
         ):
 
             patchset.append({
@@ -210,17 +205,17 @@ async def requests_limits_mutation(request: Request):
                     f"/spec/template/spec/containers/"
                     f"{index}/resources/requests/cpu"
                 ),
-                "value": desired_cpu
+                "value": cc_milli_cpu
             })
 
-            msg = f"spec.template.spec.containers[{index}].resources.requests.cpu changed from {current_request_milli_cpu}m to {desired_milli_cpu}m"
+            msg = f"spec.template.spec.containers[{index}].resources.requests.cpu changed from {current_request_milli_cpu}m to {cc_cpu}m"
             logging.warning(msg)
             error_msgs.append(msg)
 
         # MEMORY REQUEST
         if (
             current_request_mb_memory is not None
-            and current_request_mb_memory != desired_mb_memory
+            and current_request_mb_memory != cc_memory
         ):
 
             patchset.append({
@@ -229,10 +224,10 @@ async def requests_limits_mutation(request: Request):
                     f"/spec/template/spec/containers/"
                     f"{index}/resources/requests/memory"
                 ),
-                "value": desired_memory
+                "value": cc_mb_memory
             })
 
-            msg = f"spec.template.spec.containers[{index}].resources.requests.memory changed from {current_request_mb_memory}Mi to {desired_mb_memory}Mi"
+            msg = f"spec.template.spec.containers[{index}].resources.requests.memory changed from {current_request_mb_memory}Mi to {cc_memory}Mi"
             logging.warning(msg)
 
             error_msgs.append(msg)
@@ -249,6 +244,6 @@ async def requests_limits_mutation(request: Request):
         logging.info(f"Mutated deployment={deployment_name}, namespace={namespace}, patches={len(patchset)}")
 
     else:
-        logging.debug(f"Deployment '{deployment_name}' namespace '{namespace}' resources are already at desired values, skipping mutation")
+        logging.debug(f"Skipping mutation for Deployment '{deployment_name}' namespace '{namespace}'")
 
     return output_response(json_res)
