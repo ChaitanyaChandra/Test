@@ -43,7 +43,7 @@ spec:
               value: "dev"
 
             - name: APP_VERSION
-              value: "3.0 - latest"
+              value: "1.0 - latest"
 
             - name: POD_NAME
               valueFrom:
