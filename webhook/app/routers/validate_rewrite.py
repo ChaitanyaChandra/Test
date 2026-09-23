@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 import logging
 import re
-from api.routers.defaults import default_response, output_response
+from app.routers.defaults import default_response, output_response
 
 router = APIRouter(
     tags=['Block re-write params in Ingress annotation'],
