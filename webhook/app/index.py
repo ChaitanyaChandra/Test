@@ -9,10 +9,9 @@ if os.getenv("DEBUG", "true").lower()  == "true":
 
 app = FastAPI()
 
-app.get("/health")
-def health():
-    return "200 - OK"
-
 app.include_router(validate_rewrite.router)
 app.include_router(requests_limits.router)
 
+app.get("/health")
+def health():
+    return "200 - OK"

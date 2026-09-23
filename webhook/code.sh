@@ -73,11 +73,21 @@ curl -k -X POST https://master.chaitu.net:5555/mutate \
 kubectl run webhook-pod --image=chaitanyachandra/webhook:arm_3.0 -it --rm -- /bin/sh
 
 
-uvicorn --host 0.0.0.0 --port 8080 index:app --ssl-keyfile ../CA/tls.key --ssl-certfile ../CA/tls.crt
+uvicorn --host 0.0.0.0 --port 5555 index:app --ssl-keyfile ../CA/tls.key --ssl-certfile ../CA/tls.crt
 
-curl -k -X POST https://localhost:8080/validate-rewrite/validate \
+curl --resolve master.chaitu.net:5555:129.159.23.81 \
+  --cacert CA/ca.crt \
+  -X POST https://master.chaitu.net:5555/validate-rewrite/validate \
   -H "Content-Type: application/json" \
-  --data @test.json
+  --data @test/re-write-test.json
+
+curl --resolve master.chaitu.net:5555:129.159.23.81 \
+  --cacert CA/ca.crt \
+  -X POST https://master.chaitu.net:5555/requests-limits/mutate \
+  -H "Content-Type: application/json" \
+  --data @test/deploy-test.json
+
+
 
 # {"apiVersion":"admission.k8s.io/v1","kind":"AdmissionReview","response":{"uid":"67890","allowed":false,"warnings":["'nginx.ingress.kubernetes.io/rewrite-target: /name$1,age=$2' must not contain values like $1, $2, etc."]}}
 
