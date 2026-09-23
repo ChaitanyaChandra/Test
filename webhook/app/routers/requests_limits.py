@@ -1,5 +1,5 @@
 import logging
-import aiomysql
+import mysql
 import os
 from fastapi import APIRouter, Request
 
