@@ -1,6 +1,6 @@
 import os
 from fastapi import FastAPI
-from routers import validate_rewrite
+from routers import validate_rewrite, requests_limits
 import logging
 
 
@@ -10,6 +10,7 @@ if os.getenv("DEBUG", "false").lower()  == "true":
 app = FastAPI()
 
 app.include_router(validate_rewrite.router)
+app.include_router(requests_limits.router)
 
 app.get("/health")
 def health():

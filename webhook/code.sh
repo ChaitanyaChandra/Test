@@ -80,3 +80,26 @@ curl -k -X POST https://localhost:8080/validate-rewrite/validate \
   --data @test.json
 
 # {"apiVersion":"admission.k8s.io/v1","kind":"AdmissionReview","response":{"uid":"67890","allowed":false,"warnings":["'nginx.ingress.kubernetes.io/rewrite-target: /name$1,age=$2' must not contain values like $1, $2, etc."]}}
+
+mysql -e "
+CREATE TABLE c_logs (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    cluster_name VARCHAR(255) NOT NULL,
+    namespace VARCHAR(255) NOT NULL,
+    deployment VARCHAR(255) NOT NULL,
+    container VARCHAR(255) NOT NULL,
+    cpu INT NOT NULL,
+    memory INT NOT NULL,
+    log_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+"
+
+mysql -e "
+INSERT INTO c_logs
+    (cluster_name, namespace, deployment, container, cpu, memory)
+VALUES
+    ('master', 'chaitanya-chandra-testing', 'demo-deployment-1', 'demo-container', 450, 249),
+    ('master', 'chaitanya-chandra-testing', 'demo-deployment-2', 'demo-container', 500, 250),
+    ('master', 'chaitanya-chandra-testing', 'demo-deployment-2', 'demo-container-two', 600, 256);
+"
