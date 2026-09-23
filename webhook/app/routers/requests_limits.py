@@ -148,11 +148,7 @@ async def requests_limits_mutation(request: Request):
 
     if kind != "Deployment":
 
-        logging.debug(
-            f"Skipping kind={kind}, "
-            f"deployment={deployment_name}"
-        )
-
+        logging.debug(f"Skipping kind={kind}, deployment={deployment_name}")
         return output_response(json_res)
 
     # ---------------------------------------------------------
@@ -195,14 +191,7 @@ async def requests_limits_mutation(request: Request):
 
         if not desired:
 
-            logging.debug(
-                f"No c_logs entry found for "
-                f"cluster=master, "
-                f"namespace={namespace}, "
-                f"deployment={deployment_name}, "
-                f"container={container_name}"
-            )
-
+            logging.debug(f"No c_logs entry found for cluster=master, namespace={namespace}, deployment={deployment_name}, container={container_name}")
             continue
 
         desired_milli_cpu = desired["milli_cpu"]
@@ -227,11 +216,7 @@ async def requests_limits_mutation(request: Request):
 
         if not resources:
 
-            logging.debug(
-                f"Skipping container={container_name}: "
-                f"resources is not defined"
-            )
-
+            logging.debug(f"Skipping container={container_name}: resources is not defined")
             continue
 
         # -----------------------------------------------------
@@ -244,11 +229,7 @@ async def requests_limits_mutation(request: Request):
 
         if not requests:
 
-            logging.debug(
-                f"Skipping container={container_name}: "
-                f"requests is not defined"
-            )
-
+            logging.debug(f"Skipping container={container_name}: requests is not defined")
             continue
 
         # -----------------------------------------------------
@@ -261,11 +242,7 @@ async def requests_limits_mutation(request: Request):
 
         if not limits:
 
-            logging.debug(
-                f"Skipping container={container_name}: "
-                f"limits is not defined"
-            )
-
+            logging.debug(f"Skipping container={container_name}: limits is not defined")
             continue
 
         # -----------------------------------------------------
@@ -316,15 +293,7 @@ async def requests_limits_mutation(request: Request):
             else None
         )
 
-        logging.debug(
-            f"Container={container_name}, "
-            f"request_cpu={current_request_milli_cpu}m, "
-            f"request_memory={current_request_mb_memory}Mi, "
-            f"limit_cpu={current_limit_milli_cpu}m, "
-            f"limit_memory={current_limit_mb_memory}Mi, "
-            f"desired_cpu={desired_milli_cpu}m, "
-            f"desired_memory={desired_mb_memory}Mi"
-        )
+        logging.debug(f"Container={container_name}, request_cpu={current_request_milli_cpu}m, request_memory={current_request_mb_memory}Mi, limit_cpu={current_limit_milli_cpu}m, limit_memory={current_limit_mb_memory}Mi, desired_cpu={desired_milli_cpu}m, desired_memory={desired_mb_memory}Mi")
 
         # =====================================================
         # CPU REQUEST
@@ -344,14 +313,7 @@ async def requests_limits_mutation(request: Request):
                 "value": desired_cpu
             })
 
-            msg = (
-                f"spec.template.spec.containers[{index}]"
-                f".resources.requests.cpu "
-                f"changed from "
-                f"{current_request_milli_cpu}m to "
-                f"{desired_milli_cpu}m"
-            )
-
+            msg = f"spec.template.spec.containers[{index}].resources.requests.cpu changed from {current_request_milli_cpu}m to {desired_milli_cpu}m"
             logging.warning(msg)
 
             error_msgs.append(msg)
@@ -374,14 +336,7 @@ async def requests_limits_mutation(request: Request):
                 "value": desired_memory
             })
 
-            msg = (
-                f"spec.template.spec.containers[{index}]"
-                f".resources.requests.memory "
-                f"changed from "
-                f"{current_request_mb_memory}Mi to "
-                f"{desired_mb_memory}Mi"
-            )
-
+            msg = f"spec.template.spec.containers[{index}].resources.requests.memory changed from {current_request_mb_memory}Mi to {desired_mb_memory}Mi"
             logging.warning(msg)
 
             error_msgs.append(msg)
@@ -404,13 +359,7 @@ async def requests_limits_mutation(request: Request):
                 "value": desired_cpu
             })
 
-            msg = (
-                f"spec.template.spec.containers[{index}]"
-                f".resources.limits.cpu "
-                f"changed from "
-                f"{current_limit_milli_cpu}m to "
-                f"{desired_milli_cpu}m"
-            )
+            msg = f"spec.template.spec.containers[{index}].resources.limits.cpu changed from {current_limit_milli_cpu}m to {desired_milli_cpu}m"
 
             logging.warning(msg)
 
@@ -434,14 +383,7 @@ async def requests_limits_mutation(request: Request):
                 "value": desired_memory
             })
 
-            msg = (
-                f"spec.template.spec.containers[{index}]"
-                f".resources.limits.memory "
-                f"changed from "
-                f"{current_limit_mb_memory}Mi to "
-                f"{desired_mb_memory}Mi"
-            )
-
+            msg = f"spec.template.spec.containers[{index}].resources.limits.memory changed from {current_limit_mb_memory}Mi to {desired_mb_memory}Mi"
             logging.warning(msg)
 
             error_msgs.append(msg)
@@ -459,20 +401,10 @@ async def requests_limits_mutation(request: Request):
         )
 
         json_res["response"]["allowed"] = True
-
-        logging.info(
-            f"Mutated deployment={deployment_name}, "
-            f"namespace={namespace}, "
-            f"patches={len(patchset)}"
-        )
+        logging.info(f"Mutated deployment={deployment_name}, namespace={namespace}, patches={len(patchset)}")
 
     else:
 
-        logging.debug(
-            f"Deployment '{deployment_name}' "
-            f"namespace '{namespace}' resources "
-            f"are already at desired values, "
-            f"skipping mutation"
-        )
+        logging.debug(f"Deployment '{deployment_name}' namespace '{namespace}' resources are already at desired values, skipping mutation")
 
     return output_response(json_res)
