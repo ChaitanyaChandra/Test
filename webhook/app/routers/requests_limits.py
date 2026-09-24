@@ -208,7 +208,7 @@ async def requests_limits_mutation(request: Request):
                 "value": cc_milli_cpu
             })
 
-            msg = f"container: {container_name}, spec.template.spec.containers[{index}].resources.requests.cpu changed from {current_request_milli_cpu}m to {cc_cpu}m"
+            msg = f"deployment={deployment_name}, container={container_name}, spec.template.spec.containers[{index}].resources.requests.cpu changed from {current_request_milli_cpu}m to {cc_cpu}m"
             logging.warning(msg)
             error_msgs.append(msg)
 
@@ -227,7 +227,7 @@ async def requests_limits_mutation(request: Request):
                 "value": cc_mb_memory
             })
 
-            msg = f"container: {container_name}, spec.template.spec.containers[{index}].resources.requests.memory changed from {current_request_mb_memory}Mi to {cc_memory}Mi"
+            msg = f"deployment={deployment_name}, container={container_name}, spec.template.spec.containers[{index}].resources.requests.memory changed from {current_request_mb_memory}Mi to {cc_memory}Mi"
             logging.warning(msg)
 
             error_msgs.append(msg)
