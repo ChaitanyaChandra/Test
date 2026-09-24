@@ -27,21 +27,14 @@ DB_CONFIG = {
 }
 
 
-from decimal import Decimal
-
-
 def cpu_to_milli_cpu(cpu):
     """
-    Convert Kubernetes CPU quantity to milli CPU.
+    Convert Kubernetes CPU value to milli CPU.
 
-    Examples:
-        "100m"  -> 100
-        "500m"  -> 500
-        "1"     -> 1000
-        "0.5"   -> 500
-        "0.05"  -> 50
-        "0.001" -> 1
-        100     -> 100000
+    100m -> 100
+    500m -> 500
+    1    -> 1000
+    0.5  -> 500
     """
 
     if cpu is None:
@@ -50,32 +43,19 @@ def cpu_to_milli_cpu(cpu):
     cpu = str(cpu).strip()
 
     if cpu.endswith("m"):
-        return int(Decimal(cpu[:-1]))
+        return int(cpu[:-1])
 
-    return int(Decimal(cpu) * 1000)
-
-
-from decimal import Decimal
+    return int(float(cpu) * 1000)
 
 
 def memory_to_mb(memory):
     """
-    Convert Kubernetes memory quantity to MiB.
+    Convert Kubernetes memory value to MB/MiB.
 
-    Examples:
-        "256Mi"   -> 256
-        "512Mi"   -> 512
-        "1Gi"     -> 1024
-        "0.5Gi"   -> 512
-        "1024Ki"  -> 1
-        "2048Ki"  -> 2
-        "1Ti"     -> 1048576
-
-    Plain values are interpreted as bytes.
-
-    Returns:
-        int: Memory in MiB
-        None: if memory is None
+    256Mi -> 256
+    512Mi -> 512
+    1Gi   -> 1024
+    1024Ki -> 1
     """
 
     if memory is None:
@@ -83,23 +63,20 @@ def memory_to_mb(memory):
 
     memory = str(memory).strip()
 
-    if not memory:
-        return None
-
     if memory.endswith("Ki"):
-        return int(Decimal(memory[:-2]) / Decimal(1024))
+        return int(float(memory[:-2]) / 1024)
 
     if memory.endswith("Mi"):
-        return int(Decimal(memory[:-2]))
+        return int(float(memory[:-2]))
 
     if memory.endswith("Gi"):
-        return int(Decimal(memory[:-2]) * Decimal(1024))
+        return int(float(memory[:-2]) * 1024)
 
     if memory.endswith("Ti"):
-        return int(Decimal(memory[:-2]) * Decimal(1024) * Decimal(1024))
+        return int(float(memory[:-2]) * 1024 * 1024)
 
-    # Plain Kubernetes memory quantity is bytes
-    return int(Decimal(memory) / (Decimal(1024) * Decimal(1024)))
+    # Plain Kubernetes memory value is bytes
+    return int(int(memory) / (1024 * 1024))
 
 
 async def get_resource_values(
