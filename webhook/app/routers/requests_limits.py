@@ -36,10 +36,12 @@ def cpu_to_milli_cpu(cpu):
 
     cpu = str(cpu).strip()
 
-    if cpu.endswith("m"):
-        return parse_number(float(cpu[:-1]))
-
-    return parse_number(float(cpu) * 1000)
+    try:
+        if cpu.endswith("m"):
+            return parse_number(float(cpu[:-1]))
+        return parse_number(float(cpu) * 1000)
+    except ValueError:
+        return None
 
 
 def memory_to_mb(memory):
@@ -48,19 +50,31 @@ def memory_to_mb(memory):
 
     memory = str(memory).strip()
 
-    if memory.endswith("Ki"):
-        return parse_number(float(memory[:-2]) / 1024)
+    try: 
+        if memory.endswith("Ki"):
+            return parse_number(float(memory[:-2]) / 1024)
 
-    if memory.endswith("Mi"):
-        return parse_number(float(memory[:-2]))
+        if memory.endswith("Mi"):
+            return parse_number(float(memory[:-2]))
 
-    if memory.endswith("Gi"):
-        return parse_number(float(memory[:-2]) * 1024)
+        if memory.endswith("Gi"):
+            return parse_number(float(memory[:-2]) * 1024)
 
-    if memory.endswith("Ti"):
-        return parse_number(float(memory[:-2]) * 1024 * 1024)
+        if memory.endswith("Ti"):
+            return parse_number(float(memory[:-2]) * 1024 * 1024)
 
-    try:
+        if memory.endswith("K"):
+            return parse_number(float(memory[:-1]) * 1000 / (1024 * 1024))
+
+        if memory.endswith("M"):
+            return parse_number(float(memory[:-1]) * 1000000 / (1024 * 1024))
+
+        if memory.endswith("G"):
+            return parse_number(float(memory[:-1]) * 1000000000 / (1024 * 1024))
+
+        if memory.endswith("m"):
+            return parse_number(float(memory[:-1]) * 0.001 / (1024 * 1024))
+
         return parse_number(float(memory) / (1024 * 1024))
     except ValueError:
         return None
