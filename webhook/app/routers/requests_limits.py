@@ -27,57 +27,43 @@ DB_CONFIG = {
 }
 
 
+def parse_number(val):
+    return int(val) if val.is_integer() else val
+
 def cpu_to_milli_cpu(cpu):
-    """
-    Convert Kubernetes CPU value to milli CPU.
-
-    100m -> 100
-    500m -> 500
-    1    -> 1000
-    0.5  -> 500
-    """
-
     if cpu is None:
         return None
 
     cpu = str(cpu).strip()
 
     if cpu.endswith("m"):
-        return int(cpu[:-1])
+        return parse_number(float(cpu[:-1]))
 
-    return int(float(cpu) * 1000)
+    return parse_number(float(cpu) * 1000)
 
 
 def memory_to_mb(memory):
-    """
-    Convert Kubernetes memory value to MB/MiB.
-
-    256Mi -> 256
-    512Mi -> 512
-    1Gi   -> 1024
-    1024Ki -> 1
-    """
-
     if memory is None:
         return None
 
     memory = str(memory).strip()
 
     if memory.endswith("Ki"):
-        return int(float(memory[:-2]) / 1024)
+        return parse_number(float(memory[:-2]) / 1024)
 
     if memory.endswith("Mi"):
-        return int(float(memory[:-2]))
+        return parse_number(float(memory[:-2]))
 
     if memory.endswith("Gi"):
-        return int(float(memory[:-2]) * 1024)
+        return parse_number(float(memory[:-2]) * 1024)
 
     if memory.endswith("Ti"):
-        return int(float(memory[:-2]) * 1024 * 1024)
+        return parse_number(float(memory[:-2]) * 1024 * 1024)
 
-    # Plain Kubernetes memory value is bytes
-    return int(int(memory) / (1024 * 1024))
-
+    try:
+        return parse_number(float(memory) / (1024 * 1024))
+    except ValueError:
+        return None
 
 async def get_resource_values(
     namespace: str,
