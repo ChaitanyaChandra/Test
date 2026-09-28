@@ -113,3 +113,19 @@ VALUES
     ('master', 'chaitanya-chandra-testing', 'demo-deployment-2', 'demo-container', 500, 250),
     ('master', 'chaitanya-chandra-testing', 'demo-deployment-2', 'demo-container-two', 600, 256);
 "
+
+kubectl create secret generic cc-secrets \
+  --from-literal=DB_HOST=master.chaitu.net \
+  --from-literal=DB_PORT=3306 \
+  --from-literal=DB_USER= \
+  --from-literal=DB_PASSWORD='' \
+  --from-literal=DB_NAME=cc
+
+  # Create a busybox deployment (runs sleep so it doesn't crash loop)
+kubectl create deployment busybox-test --image=busybox -- sleep 3600
+
+# Patch the deployment to mount the secrets
+kubectl patch deployment busybox-test \
+-p '{"spec": {"template": {"spec": {"containers": [{"name": "busybox", "envFrom": [{"secretRef": {"name": "cc-secrets"}}]}]}}}}'
+
+kubectl logs -f deploy/busybox-test -c busybox
