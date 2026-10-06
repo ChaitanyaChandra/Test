@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: busybox-test
+  name: busybox-test
+  namespace: test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: busybox-test
+  template:
+    metadata:
+      labels:
+        app: busybox-test
+    spec:
+      containers:
+      - command:
+        - sleep
+        - "3600"
+        envFrom:
+        - secretRef:
+            name: cc-secrets
+        image: busybox
+        name: busybox
