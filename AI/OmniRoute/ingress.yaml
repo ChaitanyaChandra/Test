@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTP
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  name: omni
+  namespace: omni
+spec:
+  ingressClassName: public
+  rules:
+  - host: omni.chaitu.net
+    http:
+      paths:
+      - backend:
+          service:
+            name: omni-server
+            port:
+              number: 443
+        path: /(.*)
+        pathType: ImplementationSpecific

@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: claudemem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: claudemem-data-pvc
+  namespace: claudemem
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: claudemem-server
+  namespace: claudemem
+  labels:
+    app: claudemem-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: claudemem-server
+  template:
+    metadata:
+      labels:
+        app: claudemem-server
+    spec:
+      containers:
+        - name: claudemem
+          image: supercorp/supergateway:latest
+          imagePullPolicy: Always
+          args:
+            - --port
+            - "3000"
+            - --stdio
+            - "npx -y @modelcontextprotocol/server-memory"
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: MEMORY_FILE_PATH
+              value: "/data/memory.jsonl"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - mountPath: /data
+              name: memory-storage
+          readinessProbe:
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 5
+          livenessProbe:
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 30
+            failureThreshold: 3
+      volumes:
+        - name: memory-storage
+          persistentVolumeClaim:
+            claimName: claudemem-data-pvc

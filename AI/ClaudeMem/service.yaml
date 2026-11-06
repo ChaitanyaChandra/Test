@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: claudemem-server
+  namespace: claudemem
+  labels:
+    app: claudemem-server
+spec:
+  type: ClusterIP
+  selector:
+    app: claudemem-server
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+      protocol: TCP
+

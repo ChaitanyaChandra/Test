@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: omni
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: omniroute-data-pvc
+  namespace: omni
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: omniroute-secrets
+#   namespace: omni
+# type: Opaque
+# stringData:
+#   INITIAL_PASSWORD: "ChangeThisToASecureAdminPassword"
+#   JWT_SECRET: "generate-a-strong-random-jwt-string"
+#   API_KEY_SECRET: "generate-a-strong-random-api-key-string"
+# ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: omni-server
+  namespace: omni
+  labels:
+    app: omni-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: omni-server
+  template:
+    metadata:
+      labels:
+        app: omni-server
+    spec:
+      containers:
+        - name: omniroute
+          image: diegosouzapw/omniroute:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 20128
+              name: http
+          env:
+            - name: PORT
+              value: "20128"
+            - name: OMNIROUTE_MEMORY_MB
+              value: "2048"
+          envFrom:
+            - secretRef:
+                name: omniroute-secrets
+          resources:
+            requests:
+              cpu: 500m
+              memory: 2Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+          volumeMounts:
+            - mountPath: /app/data
+              name: data-storage
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 20128
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 20128
+            initialDelaySeconds: 20
+            periodSeconds: 30
+            failureThreshold: 3
+      volumes:
+        - name: data-storage
+          persistentVolumeClaim:
+            claimName: omniroute-data-pvc
+
